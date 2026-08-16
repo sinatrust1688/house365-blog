@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://sinatrust1688.github.io/house365-blog/sitemap.xml
