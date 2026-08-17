@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
-Disallow: /img/
+Disallow: /img/homepage/
+Disallow: /img/social/
 Sitemap: https://sinatrust1688.github.io/house365-blog/sitemap.xml
