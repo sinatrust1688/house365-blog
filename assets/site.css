@@ -131,7 +131,11 @@ table.facts tr:last-child th,table.facts tr:last-child td{border-bottom:0}
 /* Agent / CTA */
 .agent{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:20px 0}
 .agent .who{display:flex;gap:14px;flex-wrap:wrap;margin:6px 0 10px}
-.agent .who div{flex:1 1 200px;background:var(--g2);border-radius:10px;padding:10px 12px}
+.agent .who > div{flex:1 1 240px;background:var(--g2);border-radius:10px;padding:12px;display:flex;gap:12px;align-items:center}
+.agent .who .face{width:72px;height:72px;border-radius:50%;object-fit:cover;flex:0 0 72px;background:#e6ebe8}
+.agent .who .txt{display:block;min-width:0;flex:1 1 auto}
+.agent .who .txt .small{display:block;margin:2px 0 3px;line-height:1.5}
+.agent .who .txt b{display:block;font-size:17px;line-height:1.35}
 .agent .who b{font-size:17px}
 .agent .who a{display:block;font-weight:700;text-decoration:none;font-size:18px}
 .agent .org{color:#555;font-size:13px;margin-top:8px}
@@ -164,3 +168,16 @@ table.facts tr:last-child th,table.facts tr:last-child td{border-bottom:0}
 .more{text-align:right;font-size:14px}
 .err{ text-align:center;padding:40px 0}
 .err h1{font-size:26px}
+
+/* 團隊照（首頁 hero／關於我們） */
+.hero .team{width:100%;height:auto;max-width:460px;border-radius:14px;display:block;margin:0 0 16px;
+box-shadow:0 2px 12px rgba(0,0,0,.12)}
+.about-2col{display:grid;grid-template-columns:1fr;gap:18px;align-items:start}
+.about-2col .formal{width:100%;height:auto;max-width:300px;border-radius:12px;display:block}
+@media(min-width:760px){
+  .about-2col{grid-template-columns:260px minmax(0,1fr)}
+  .hero{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:24px;align-items:center}
+  .hero .team{margin:0;max-width:360px}
+  .hero h1,.hero p,.hero .search,.hero .small{grid-column:1}
+  .hero .team{grid-column:2;grid-row:1/5}
+}
