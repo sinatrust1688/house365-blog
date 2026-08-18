@@ -1,15 +1,17 @@
 /* house365 物件官網共用樣式（listing_render.py write_assets 複製到 /assets/site.css）
-   與 blog_build.CSS 同色系（#1b6b3a 綠）；手機優先，≥900px 兩欄。 */
-:root{--g:#1b6b3a;--g2:#e8f3ec;--ink:#222;--mute:#64748b;--line:#e5e5e0;--bg:#fafaf7;--card:#fff;--line-green:#06c755;--blue:#3a5ba0;--red:#c0392b}
+   與 blog_build.CSS 同色系（#1b6b3a 綠）；手機優先，≥900px 兩欄。
+   2026-08-18 使用者選定「A＋C 混合」：保留品牌綠，改細線／大留白／高行距（質感），
+   不改版面結構與資訊順序——換風格只動本檔，1,589 頁隔天自動套用。 */
+:root{--g:#1b6b3a;--g2:#e8f3ec;--ink:#222;--mute:#64748b;--line:#ebedec;--line2:#f2f4f3;--bg:#fbfbf9;--card:#fff;--line-green:#06c755;--blue:#3a5ba0;--red:#c0392b}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;font-family:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;font-size:16px;line-height:1.75;color:var(--ink);background:var(--bg)}
+body{margin:0;font-family:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;font-size:16.5px;line-height:1.85;letter-spacing:.2px;color:var(--ink);background:var(--bg)}
 a{color:var(--g)}
 img{max-width:100%}
-h1{font-size:24px;line-height:1.35;margin:10px 0 4px}
-h2{font-size:19px;margin:28px 0 10px;padding-left:10px;border-left:4px solid var(--g);line-height:1.3}
+h1{font-size:25px;line-height:1.4;margin:14px 0 6px;font-weight:700;letter-spacing:.5px}
+h2{font-size:17.5px;margin:40px 0 14px;padding-left:11px;border-left:3px solid var(--g);line-height:1.35;letter-spacing:1.2px;font-weight:700}
 p{margin:0 0 1em}
-.wrap{max-width:1080px;margin:0 auto;padding:0 16px 90px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 18px 96px}
 /* header / footer */
 .site-header{background:var(--card);border-bottom:2px solid var(--g)}
 .site-header .in{max-width:1080px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
@@ -26,7 +28,7 @@ p{margin:0 0 1em}
 .crumb a:hover{color:var(--g)}
 .sub{color:#555;font-size:15px;margin:0 0 8px}
 .badges{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
-.badge{display:inline-block;background:var(--g2);color:var(--g);font-size:12.5px;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.badge{display:inline-block;background:var(--g2);color:var(--g);font-size:12.5px;padding:4px 11px;border-radius:999px;white-space:nowrap;letter-spacing:.5px}
 .badge.hot{background:#fdecea;color:var(--red)}
 /* 兩欄 */
 .listing{display:block}
@@ -56,7 +58,7 @@ p{margin:0 0 1em}
 .yt button:after{content:"";position:absolute;left:26px;top:14px;border-style:solid;border-width:10px 0 10px 18px;border-color:transparent transparent transparent #fff}
 .yt iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 /* 價格卡 */
-.price-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:8px 0 14px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.price-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 20px;margin:8px 0 14px;box-shadow:0 1px 3px rgba(0,0,0,.03)}
 .price-card .lab{color:var(--mute);font-size:13px}
 .price-card .total{font-size:32px;font-weight:800;color:var(--red);line-height:1.2}
 .price-card .total small{font-size:16px;font-weight:600;color:var(--ink);margin-left:2px}
@@ -80,8 +82,8 @@ p{margin:0 0 1em}
 }
 /* 表格 */
 table.facts{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:15px}
-table.facts th{text-align:left;width:7em;padding:9px 12px;color:var(--mute);font-weight:500;background:#f6f6f2;border-bottom:1px solid var(--line);vertical-align:top}
-table.facts td{padding:9px 12px;border-bottom:1px solid var(--line)}
+table.facts th{text-align:left;width:7em;padding:13px 14px;color:var(--mute);font-weight:500;background:transparent;border-bottom:1px solid var(--line2);vertical-align:top}
+table.facts td{padding:13px 14px;border-bottom:1px solid var(--line2)}
 table.facts tr:last-child th,table.facts tr:last-child td{border-bottom:0}
 @media(min-width:600px){
   table.facts.two{display:grid;grid-template-columns:1fr 1fr}
@@ -91,13 +93,13 @@ table.facts tr:last-child th,table.facts tr:last-child td{border-bottom:0}
   table.facts.two td{flex:1}
 }
 .area-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:0 0 8px}
-.area-grid div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:14px}
+.area-grid div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:14px}
 .area-grid b{display:block;font-size:17px;color:var(--ink)}
 .area-grid span{color:var(--mute);font-size:12.5px}
 .ratio{font-size:15px}
 .ratio b{color:var(--g);font-size:18px}
 .points{margin:0;padding-left:1.3em}
-.points li{margin:3px 0}
+.points li{margin:7px 0}
 .intro p{margin:0 0 .8em}
 .small,.note{color:var(--mute);font-size:13px}
 /* 地圖 / 價格帶 / 貸款 */
