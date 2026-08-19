@@ -1,5 +1,5 @@
 /* house365 物件官網前端（零外部依賴；listing_render.py write_assets 複製到 /assets/listing.js）
-   lightbox()／loan()／videoLite()／filterIndex()／homeSearch()；沒有 JS 頁面照樣可讀。 */
+   lightbox()／loan()／loanTool()／videoLite()／filterIndex()／homeSearch()；沒有 JS 頁面照樣可讀。 */
 (function () {
   'use strict';
   var BASE = (document.body.getAttribute('data-base') || '').replace(/\/$/, '');
@@ -55,7 +55,7 @@
 
   /* ── 貸款月付試算：M = P·r / (1 − (1+r)^−n) ── */
   function loan() {
-    var f = $('form.loan'); if (!f) return;
+    var f = $('form.loan[data-price]'); if (!f) return;
     var price = +f.getAttribute('data-price') || 0;   // 萬
     function calc() {
       var ltv = +f.ltv.value || 0, rate = +f.rate.value || 0, yrs = +f.years.value || 0;
@@ -65,6 +65,22 @@
     }
     $$('input', f).forEach(function (i) { i.addEventListener('input', calc); });
     f.addEventListener('submit', function (e) { e.preventDefault(); calc(); });
+    calc();
+  }
+
+  /* ── 獨立試算頁 /tools/loan/：多一格「房價」，另算自備款與總利息（公式同 loan()） ── */
+  function loanTool() {
+    var f = document.getElementById('loan-tool'); if (!f) return;
+    function calc() {
+      var pw = +f.price.value || 0, ltv = +f.ltv.value || 0, rate = +f.rate.value || 0, yrs = +f.years.value || 0;
+      var P = pw * 10000 * ltv / 100, r = rate / 100 / 12, n = Math.round(yrs * 12), m;
+      if (!P || !n) { m = 0; } else if (!r) { m = P / n; } else { m = P * r / (1 - Math.pow(1 + r, -n)); }
+      $('.m', f).textContent = fmt(m);
+      $('.pv', f).textContent = fmt(P / 10000);
+      $('.dp', f).textContent = fmt(pw - P / 10000);
+      $('.ti', f).textContent = fmt((m * n - P) / 10000);
+    }
+    $$('input', f).forEach(function (i) { i.addEventListener('input', calc); i.addEventListener('change', calc); });
     calc();
   }
 
@@ -92,18 +108,72 @@
       '<div class="pr">' + (it.p ? fmt(it.p) + ' 萬' : '價格洽詢') + (it.u ? '<small>' + it.u + ' 萬/坪</small>' : '') + '</div></div></a>';
   }
 
-  /* ── 找房頁：fetch index.json、依 hash 篩選/排序、渲染、select→hash ── */
+  /* ── 找房頁：fetch index.json、依 hash 篩選/排序、渲染、select→hash ──
+     ・縣市→區域兩層下拉，選項與件數都由 index.json 實際資料算出來（件數多→少）
+     ・網址沒帶任何條件 → 自動套 #filters 的 data-city／data-area（預設台北市大安區）
+     ・#all=1 ＝看全部（清掉所有條件）；把條件全部選成「不限」也會回到 #all=1 */
+  var KEYS = ['city', 'area', 'type', 'rooms', 'pmin', 'pmax', 'mrt', 'sort'];
   function filterIndex() {
     var box = $('#cards'); if (!box) return;
-    var form = $('#filters'), cnt = $('#count'), data = null;
+    var form = $('#filters'), now = $('#nowtext'), data = null;
+    var dCity = form ? (form.getAttribute('data-city') || '') : '';
+    var dArea = form ? (form.getAttribute('data-area') || '') : '';
+    var zipCity = {}, areaRows = [];
     function parse() {
       var o = {}; location.hash.replace(/^#/, '').split('&').forEach(function (kv) {
         if (!kv) return; var p = kv.split('='); o[decodeURIComponent(p[0])] = decodeURIComponent(p[1] || '');
       }); return o;
     }
+    function hashOf(q) {
+      return KEYS.filter(function (k) { return q[k]; })
+        .map(function (k) { return k + '=' + encodeURIComponent(q[k]); }).join('&');
+    }
+    function buildCities() {
+      var cn = {}, an = {};
+      data.items.forEach(function (it) {
+        var c = it.ct || '';
+        if (c) cn[c] = (cn[c] || 0) + 1;
+        if (!it.z) return;
+        zipCity[it.z] = c;
+        if (!an[it.z]) an[it.z] = { z: String(it.z), c: c, a: it.a || String(it.z), n: 0 };
+        an[it.z].n++;
+      });
+      areaRows = Object.keys(an).map(function (k) { return an[k]; }).sort(function (a, b) { return b.n - a.n; });
+      if (!form || !form.city) return;
+      form.city.innerHTML = '<option value="">全部縣市</option>' + Object.keys(cn)
+        .sort(function (a, b) { return cn[b] - cn[a]; })
+        .map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + '（' + fmt(cn[c]) + '）</option>'; }).join('');
+    }
+    function buildAreas(city) {   // 區域下拉只留該縣市的區
+      if (!form || !form.area) return;
+      form.area.innerHTML = '<option value="">全部區域</option>' + areaRows
+        .filter(function (r) { return !city || r.c === city; })
+        .map(function (r) { return '<option value="' + esc(r.z) + '">' + esc(r.a) + '（' + fmt(r.n) + '）</option>'; }).join('');
+    }
+    function label(q, city) {     // 「目前顯示：台北市 大安區．295 件」那行
+      var t = [city || '全部縣市'];
+      ['area', 'type', 'rooms', 'mrt'].forEach(function (k) {
+        var s = form && form[k]; if (!s || !s.value) return;
+        var o = s.options[s.selectedIndex]; if (o) t.push(o.text.replace(/（[\d,]+）$/, ''));
+      });
+      if (q.pmin || q.pmax) t.push((q.pmin ? fmt(+q.pmin) + ' 萬' : '0') + '～' + (q.pmax ? fmt(+q.pmax) + ' 萬' : '不限'));
+      return t.join(' ');
+    }
     function apply() {
       if (!data) return;
-      var q = parse(), rows = data.items.filter(function (it) {
+      var q = parse();
+      if (!location.hash.replace(/^#/, '') && (dCity || dArea)) {    // 沒帶條件 → 套預設，並寫進網址（可分享）
+        q = { city: dCity, area: dArea };
+        if (history.replaceState) history.replaceState(null, '', '#' + hashOf(q));
+      }
+      var city = q.city || (q.area ? zipCity[q.area] || '' : '');
+      buildAreas(city);
+      if (form) {
+        KEYS.forEach(function (k) { if (form[k]) form[k].value = (k === 'city' ? city : q[k]) || ''; });
+        if (form.sort) form.sort.value = q.sort || 'new';
+      }
+      var rows = data.items.filter(function (it) {
+        if (q.city && it.ct !== q.city) return false;
         if (q.area && String(it.z) !== q.area) return false;
         if (q.type && it.t !== q.type) return false;
         if (q.rooms) { var r = +it.r || 0; if (q.rooms === '4' ? r < 4 : r !== +q.rooms) return false; }
@@ -128,21 +198,26 @@
         if (mb) mb.addEventListener('click', function () { shown = Math.min(rows.length, shown + PAGE); draw(); });
       }
       draw();
-      if (cnt) cnt.textContent = '共 ' + rows.length + ' 件';
-      if (form) ['area', 'type', 'rooms', 'pmin', 'pmax', 'mrt', 'sort'].forEach(function (k) { if (form[k]) form[k].value = q[k] || ''; });
+      if (now) now.textContent = '目前顯示：' + label(q, city) + '．' + fmt(rows.length) + ' 件';
     }
-    if (form) form.addEventListener('change', function () {
-      var parts = [];
-      ['area', 'type', 'rooms', 'pmin', 'pmax', 'mrt', 'sort'].forEach(function (k) {
-        if (form[k] && form[k].value) parts.push(k + '=' + encodeURIComponent(form[k].value));
-      });
-      location.hash = parts.join('&');
+    if (form) form.addEventListener('change', function (e) {
+      if (e.target && e.target.name === 'city' && form.area) form.area.value = '';   // 換縣市 → 區域重選
+      var q = {};
+      KEYS.forEach(function (k) { if (form[k] && form[k].value) q[k] = form[k].value; });
+      if (q.sort === 'new') delete q.sort;
+      location.hash = hashOf(q) || 'all=1';        // 全部「不限」＝看全部，不要掉回預設
+    });
+    var sa = $('#showall');
+    if (sa) sa.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (location.hash.replace(/^#/, '') === 'all=1') apply(); else location.hash = 'all=1';
     });
     window.addEventListener('hashchange', apply);
     var xhr = new XMLHttpRequest();
     xhr.open('GET', BASE + '/listing/index.json', true);
     xhr.onload = function () {
       try { data = JSON.parse(xhr.responseText); } catch (e) { data = { items: [] }; }
+      buildCities();
       apply();
     };
     xhr.onerror = function () { box.innerHTML = '<p class="note">物件清單載入失敗，請重新整理。</p>'; };
@@ -155,10 +230,19 @@
     f.addEventListener('submit', function (e) {
       e.preventDefault(); var parts = [];
       ['area', 'type', 'pmin', 'pmax'].forEach(function (k) { if (f[k] && f[k].value) parts.push(k + '=' + encodeURIComponent(f[k].value)); });
-      location.href = BASE + '/listing/' + (parts.length ? '#' + parts.join('&') : '');
+      // 什麼都沒選＝我要看全部，不要掉進找房頁的預設（台北市大安區）
+      location.href = BASE + '/listing/#' + (parts.length ? parts.join('&') : 'all=1');
     });
   }
 
-  function init() { lightbox(); loan(); videoLite(); filterIndex(); homeSearch(); }
+  /* ── 右下角浮動 LINE 圓鈕：捲一段才淡入，一開始不擋內容 ── */
+  function fab() {
+    var b = $('.fab-line'); if (!b) return;
+    function t() { b.classList[(window.pageYOffset || document.documentElement.scrollTop) > 300 ? 'add' : 'remove']('on'); }
+    window.addEventListener('scroll', t, { passive: true });
+    t();
+  }
+
+  function init() { lightbox(); loan(); loanTool(); videoLite(); filterIndex(); homeSearch(); fab(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

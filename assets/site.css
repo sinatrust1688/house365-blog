@@ -117,6 +117,14 @@ table.facts tr:last-child th,table.facts tr:last-child td{border-bottom:0}
 .loan input{width:100%;font-size:16px;padding:6px 8px;border:1px solid #ccc;border-radius:8px;font-family:inherit}
 .loan .out{margin-top:10px;font-size:15px}
 .loan .out b{color:var(--red);font-size:22px}
+.loan .row.r4{grid-template-columns:repeat(2,1fr)}
+.loan .res{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.loan .res div{background:var(--g2);border-radius:10px;padding:10px 12px}
+.loan .res>div>span{display:block;color:var(--mute);font-size:13px}
+.loan .res b{font-size:19px}
+.loan .res .big{grid-column:1/-1;background:var(--card);border:1px solid var(--line)}
+.loan .res .big b{color:var(--red);font-size:30px}
+@media(min-width:700px){.loan .row.r4{grid-template-columns:repeat(4,1fr)}}
 /* 卡片 */
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin:8px 0}
 .card{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;text-decoration:none;color:var(--ink);transition:box-shadow .15s}
@@ -154,6 +162,11 @@ table.facts tr:last-child th,table.facts tr:last-child td{border-bottom:0}
 .filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin:12px 0}
 .filters label{font-size:12.5px;color:var(--mute);display:block}
 .filters select{width:100%;font-size:15px;padding:6px 6px;border:1px solid #ccc;border-radius:8px;background:#fff;font-family:inherit}
+/* 找房頁「目前顯示 台北市 大安區．295 件／看全部」列 */
+.nowbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:10px 0 6px;
+padding:10px 14px;background:var(--g2);border-radius:10px;font-size:14.5px;color:var(--g);line-height:1.5}
+.nowbar b{font-weight:700;min-width:0}
+.nowbar .btn-o{background:var(--card);white-space:nowrap;flex:0 0 auto}
 .facets{font-size:14px;line-height:2;margin:8px 0}
 .facets a{display:inline-block;margin-right:10px;color:var(--g)}
 .hero{background:linear-gradient(135deg,var(--g),#2c8a50);color:#fff;border-radius:16px;padding:28px 20px;margin:16px 0}
@@ -163,6 +176,10 @@ table.facts tr:last-child th,table.facts tr:last-child td{border-bottom:0}
 .hero select{font-size:15px;padding:8px;border-radius:8px;border:0;font-family:inherit}
 .hero button{background:#fff;color:var(--g);font-weight:700;border:0;border-radius:8px;padding:8px 16px;font-size:15px;cursor:pointer;font-family:inherit}
 @media(max-width:600px){.hero .search{grid-template-columns:1fr 1fr}.hero button{grid-column:1/3}}
+/* hero 內的 LINE 次級鈕（找房／賣房是需求入口，LINE 是聯絡方式，視覺低一級） */
+.hero .line-alt{display:inline-block;margin:12px 0 0;padding:8px 15px;border-radius:999px;color:#fff;
+background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.55);text-decoration:none;font-size:14.5px;font-weight:600}
+.hero .line-alt:hover{background:rgba(255,255,255,.28)}
 .list a{display:block;padding:12px 0;border-bottom:1px solid var(--line);color:var(--ink);text-decoration:none}
 .list a:hover{color:var(--g)}.list small{color:var(--mute);display:block}
 .more{text-align:right;font-size:14px}
@@ -179,18 +196,33 @@ box-shadow:0 2px 12px rgba(0,0,0,.12)}
   .hero{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:24px;align-items:center}
   .hero .team{margin:0;max-width:360px}
   .hero h1,.hero p,.hero .search,.hero .small{grid-column:1}
+  .hero .line-alt{grid-column:1;justify-self:start}
   .hero .team{grid-column:2;grid-row:1/5}
 }
 
-/* 首頁兩大入口 */
-.twoway{display:grid;grid-template-columns:1fr;gap:12px;margin:16px 0 8px}
-.twoway .way{display:block;padding:18px 20px;border-radius:14px;text-decoration:none;
+/* 首頁兩大需求入口（我要找房／我要賣房）；LINE 是聯絡方式 → hero 次級鈕＋右下浮動鈕＋手機底部列 */
+.ways{display:grid;grid-template-columns:1fr;gap:12px;margin:16px 0 8px}
+.ways .way{display:block;padding:18px 20px;border-radius:14px;text-decoration:none;
 border:1px solid var(--line);background:var(--card);transition:box-shadow .15s}
-.twoway .way:hover{box-shadow:0 2px 12px rgba(0,0,0,.10)}
-.twoway .way b{display:block;font-size:20px;color:var(--g);margin-bottom:4px}
-.twoway .way span{color:var(--mute);font-size:14.5px;line-height:1.6}
-.twoway .way.sell{background:var(--g2);border-color:#cfe0d6}
-@media(min-width:700px){.twoway{grid-template-columns:1fr 1fr;gap:16px}}
+.ways .way:hover{box-shadow:0 2px 12px rgba(0,0,0,.10)}
+.ways .way b{display:block;font-size:20px;color:var(--g);margin-bottom:4px}
+.ways .way span{color:var(--mute);font-size:14.5px;line-height:1.6}
+.ways .way.sell{background:var(--g2);border-color:#cfe0d6}
+@media(min-width:700px){.ways{grid-template-columns:repeat(2,1fr);gap:16px}}
+/* 右下角浮動 LINE 圓鈕（捲一段才淡入，不一開始就擋內容；手機讓開底部固定列） */
+.fab-line{position:fixed;right:18px;bottom:24px;z-index:60;width:56px;height:56px;border-radius:50%;
+background:var(--line-green);color:#fff;font-weight:700;font-size:12.5px;letter-spacing:.5px;text-decoration:none;
+display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.22);
+opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .25s,transform .25s,visibility .25s}
+.fab-line.on{opacity:1;visibility:visible;transform:none}
+@media(max-width:768px){.fab-line{right:12px;bottom:calc(76px + env(safe-area-inset-bottom));width:52px;height:52px}}
+/* 熱門生活圈（首頁內部連結） */
+.hot{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
+.hot a{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;
+border:1px solid var(--line);background:var(--card);color:var(--ink);text-decoration:none;font-size:14.5px}
+.hot a:hover{background:var(--g2);border-color:#cfe0d6;color:var(--g)}
+.hot a b{color:var(--g);font-size:13px}
+.hot-t{font-weight:700;font-size:15px;margin:18px 0 6px}
 /* 屋主見證 */
 .quotes{display:grid;gap:12px;margin:8px 0}
 .quote{margin:0;padding:16px 18px;background:var(--card);border:1px solid var(--line);border-radius:12px}
