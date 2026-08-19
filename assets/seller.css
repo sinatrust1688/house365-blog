@@ -1,0 +1,88 @@
+/* 賣方四頁（/sell/ /sell/how/ /about/ /report/）專用樣式；由 pages_seller.py 掛載。
+   只放 site.css 沒有的新 class，色彩沿用 site.css 的 :root 變數（--g/--g2/--ink/--mute/--line/--card）。
+   手機優先，≥760px 才變多欄。 */
+
+/* Hero（沿用 site.css 的 .hero 底色與 .team 圖，這裡只調兩顆鈕的排法與對比） */
+.sell-hero p{font-size:17px}
+.sell-hero .cta-btns{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 0;grid-column:1}
+.sell-hero .btn{flex:1 1 220px;margin:0;padding:12px 10px}
+.sell-hero .btn.tel{background:#fff;color:var(--g)}
+
+/* 三顆信任錨 */
+.anchors{display:grid;grid-template-columns:1fr;gap:10px;margin:10px 0 4px}
+.anchors > div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 14px;text-align:center}
+.anchors b{display:block;font-size:30px;font-weight:800;color:var(--g);line-height:1.2;letter-spacing:.5px}
+.anchors span{display:block;color:var(--mute);font-size:14px;margin-top:4px;line-height:1.55}
+
+/* 步驟清單（3 行濃縮版與 10 步共用；整句是定稿文案，不切斷成標題＋內文） */
+.steps{counter-reset:stp;list-style:none;margin:10px 0;padding:0}
+.steps li{position:relative;background:var(--card);border:1px solid var(--line);border-radius:12px;
+padding:14px 16px 14px 52px;margin:0 0 10px;line-height:1.8}
+.steps li:before{counter-increment:stp;content:counter(stp);position:absolute;left:14px;top:14px;
+width:26px;height:26px;line-height:26px;text-align:center;border-radius:50%;
+background:var(--g);color:#fff;font-weight:700;font-size:14px}
+
+/* 前 30 天時程表（窄螢幕橫向捲，不擠成一團） */
+.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:10px 0 6px}
+.timeline{width:100%;min-width:460px;border-collapse:collapse;background:var(--card);
+border:1px solid var(--line);border-radius:12px;font-size:15px}
+.timeline th,.timeline td{padding:11px 13px;border-bottom:1px solid var(--line2);text-align:left;vertical-align:top}
+.timeline thead th{background:var(--g2);color:var(--g);font-weight:700;white-space:nowrap}
+.timeline tbody tr:last-child td{border-bottom:0}
+.timeline td:first-child{white-space:nowrap;color:var(--g);font-weight:700}
+.timeline th:nth-child(2),.timeline td:nth-child(2){width:46%}
+
+/* 窄螢幕：時程表改成一天一張卡，不用左右滑 */
+@media(max-width:619px){
+  .tblwrap{overflow:visible}
+  .timeline{min-width:0;border:0;background:transparent}
+  .timeline thead{display:none}
+  .timeline tbody tr{display:block;background:var(--card);border:1px solid var(--line);
+  border-radius:12px;padding:12px 14px;margin:0 0 10px}
+  .timeline td{display:block;border:0;padding:2px 0;width:auto}
+  .timeline td:first-child{font-size:15.5px}
+  .timeline td:last-child:before{content:"你會收到：";color:var(--mute)}
+}
+
+/* 9 個通路 */
+.channels{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:10px 0 6px;padding:0}
+.channels li{background:var(--g2);color:var(--g);border-radius:999px;padding:7px 15px;font-size:14.5px;font-weight:700}
+
+/* 戰報：四格大字 */
+.statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0 8px}
+.bignum{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 14px;text-align:center}
+.bignum b{display:block;font-size:27px;font-weight:800;color:var(--g);line-height:1.2}
+.bignum span{display:block;color:var(--mute);font-size:13.5px;margin-top:3px}
+
+
+/* 每一組數字底下的來源行（法規要求：來源＋更新日期） */
+.srcline{color:var(--mute);font-size:12.5px;margin:8px 0 4px;line-height:1.7}
+
+/* 等使用者提供內容的佔位框 */
+.placeholder{background:var(--card);border:1px dashed #cfd6d2;border-radius:12px;
+padding:16px;color:var(--mute);font-size:14.5px;margin:8px 0}
+
+/* FAQ */
+.faq details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 16px;margin:0 0 9px}
+.faq summary{font-weight:700;cursor:pointer;list-style:none}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary:before{content:"＋ ";color:var(--g);font-weight:800}
+.faq details[open] summary:before{content:"− "}
+.faq p{margin:9px 0 0;color:#444;font-size:15px}
+
+/* 戰報頁的小合照（一定要 height:auto，不然 width/height 屬性會把橫幅拉成長方形） */
+img.shot{width:100%;max-width:320px;height:auto;border-radius:12px;display:block;margin:8px 0 12px;
+box-shadow:0 2px 12px rgba(0,0,0,.10)}
+
+/* 兩顆鈕排成一排（行情入口用；hero 另有自己的規則） */
+.btn-row{display:flex;flex-wrap:wrap;gap:10px;max-width:620px}
+.btn-row .btn{flex:1 1 240px;margin:8px 0 0}
+
+@media(min-width:760px){
+  .anchors{grid-template-columns:repeat(3,1fr)}
+  /* 標籤欄放寬（「生活機能實測覆蓋率」9 個字）；手機維持 site.css 的 7em 才不會擠 */
+  table.facts.rep th{width:12em;white-space:nowrap}
+  .statgrid{grid-template-columns:repeat(4,1fr)}
+  .bignum b{font-size:31px}
+  .timeline{min-width:0}
+}
