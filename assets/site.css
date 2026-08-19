@@ -181,3 +181,18 @@ box-shadow:0 2px 12px rgba(0,0,0,.12)}
   .hero h1,.hero p,.hero .search,.hero .small{grid-column:1}
   .hero .team{grid-column:2;grid-row:1/5}
 }
+
+/* 首頁兩大入口 */
+.twoway{display:grid;grid-template-columns:1fr;gap:12px;margin:16px 0 8px}
+.twoway .way{display:block;padding:18px 20px;border-radius:14px;text-decoration:none;
+border:1px solid var(--line);background:var(--card);transition:box-shadow .15s}
+.twoway .way:hover{box-shadow:0 2px 12px rgba(0,0,0,.10)}
+.twoway .way b{display:block;font-size:20px;color:var(--g);margin-bottom:4px}
+.twoway .way span{color:var(--mute);font-size:14.5px;line-height:1.6}
+.twoway .way.sell{background:var(--g2);border-color:#cfe0d6}
+@media(min-width:700px){.twoway{grid-template-columns:1fr 1fr;gap:16px}}
+/* 屋主見證 */
+.quotes{display:grid;gap:12px;margin:8px 0}
+.quote{margin:0;padding:16px 18px;background:var(--card);border:1px solid var(--line);border-radius:12px}
+.quote p{margin:0 0 8px}
+.quote cite{color:var(--mute);font-size:13.5px;font-style:normal}
