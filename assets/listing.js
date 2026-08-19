@@ -97,7 +97,7 @@
     });
   }
 
-  /* ── 卡片（找房頁 JS 渲染；與 listing_render.card_html 同形） ── */
+  /* ── 卡片（找房頁／地圖頁 JS 渲染；與 listing_render.card_html 同形） ── */
   function card(it) {
     var cover = it.ph || NOPHOTO, ref = /hbhousing\.com\.tw/.test(cover) ? ' referrerpolicy="no-referrer"' : '';
     var meta = [it.a, it.tl, it.r ? it.r + '房' : '', it.pg ? it.pg + '坪' : ''].filter(Boolean).join('｜');
@@ -108,120 +108,353 @@
       '<div class="pr">' + (it.p ? fmt(it.p) + ' 萬' : '價格洽詢') + (it.u ? '<small>' + it.u + ' 萬/坪</small>' : '') + '</div></div></a>';
   }
 
-  /* ── 找房頁：fetch index.json、依 hash 篩選/排序、渲染、select→hash ──
-     ・縣市→區域兩層下拉，選項與件數都由 index.json 實際資料算出來（件數多→少）
-     ・網址沒帶任何條件 → 自動套 #filters 的 data-city／data-area（預設台北市大安區）
-     ・#all=1 ＝看全部（清掉所有條件）；把條件全部選成「不限」也會回到 #all=1 */
+  /* ══ 篩選條件：網址 hash ⇄ 物件 ══════════════════════════════
+     ・單選：city／pmin／pmax／mrt／sort　・複選（逗號串）：area／type／rooms
+     ・舊連結（#area=106、#type=building、#mrt=daan）照樣通——逗號串只是多一個值 */
   var KEYS = ['city', 'area', 'type', 'rooms', 'pmin', 'pmax', 'mrt', 'sort'];
+  var MULTI = { area: 1, type: 1, rooms: 1 };
+  var INDEX = null, INDEX_CBS = [];
+
+  function parseHash() {
+    var o = {};
+    location.hash.replace(/^#/, '').split('&').forEach(function (kv) {
+      if (!kv) return;
+      var p = kv.split('='), k = decodeURIComponent(p[0]), v = decodeURIComponent(p[1] || '');
+      if (!v) return;
+      o[k] = MULTI[k] ? v.split(',').filter(Boolean) : v;
+    });
+    return o;
+  }
+  function hashOf(q) {
+    return KEYS.filter(function (k) { return MULTI[k] ? (q[k] && q[k].length) : q[k]; })
+      .map(function (k) { return k + '=' + encodeURIComponent(MULTI[k] ? q[k].join(',') : q[k]); }).join('&');
+  }
+  function matches(q) {
+    return function (it) {
+      if (q.city && it.ct !== q.city) return false;
+      if (q.area && q.area.length && q.area.indexOf(String(it.z)) < 0) return false;
+      if (q.type && q.type.length && q.type.indexOf(it.t) < 0) return false;
+      if (q.rooms && q.rooms.length) {
+        var r = +it.r || 0, hit = q.rooms.some(function (x) { return x === '4' ? r >= 4 : r === +x; });
+        if (!hit) return false;
+      }
+      if (q.pmin && !(it.p >= +q.pmin)) return false;
+      if (q.pmax && !(it.p <= +q.pmax)) return false;
+      if (q.mrt && it.ms !== q.mrt) return false;
+      return true;
+    };
+  }
+  function sortRows(rows, s) {
+    return rows.sort(function (a, b) {
+      if (s === 'plow') return (a.p || 1e12) - (b.p || 1e12);
+      if (s === 'phigh') return (b.p || 0) - (a.p || 0);
+      if (s === 'ulow') return (a.u || 1e12) - (b.u || 1e12);
+      if (s === 'big') return (b.pg || 0) - (a.pg || 0);
+      return (b.d || '') > (a.d || '') ? 1 : (b.d || '') < (a.d || '') ? -1 : 0;
+    });
+  }
+  /* index.json 只抓一次，找房頁與地圖頁共用 */
+  function loadIndex(cb) {
+    if (INDEX) { cb(INDEX); return; }
+    INDEX_CBS.push(cb);
+    if (INDEX_CBS.length > 1) return;
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', BASE + '/listing/index.json', true);
+    xhr.onload = function () {
+      try { INDEX = JSON.parse(xhr.responseText); } catch (e) { INDEX = { items: [] }; }
+      INDEX_CBS.splice(0).forEach(function (f) { f(INDEX); });
+    };
+    xhr.onerror = function () { INDEX = { items: [] }; INDEX_CBS.splice(0).forEach(function (f) { f(INDEX); }); };
+    xhr.send();
+  }
+
+  /* ══ 信義式下拉面板（區域／類型／總價／格局／更多）══════════════
+     每顆鈕一個 .pick：按鈕開關 .pk-pop，面板內是 checkbox／快選帶／select。
+     面板只改 DOM，不改網址；按「確定」或「搜尋」才寫 location.hash（＝才會重新篩選）。 */
+  function picker(form, onApply) {
+    var picks = $$('.pick', form);
+    var selCity = form.getAttribute('data-city') || '';
+
+    function close(p) { var pop = $('.pk-pop', p); if (pop) { pop.hidden = true; $('.pk-btn', p).setAttribute('aria-expanded', 'false'); } }
+    function closeAll(except) { picks.forEach(function (p) { if (p !== except) close(p); }); }
+    function open(p) {
+      closeAll(p);
+      var pop = $('.pk-pop', p), btn = $('.pk-btn', p);
+      var willOpen = pop.hidden;
+      pop.hidden = !willOpen; btn.setAttribute('aria-expanded', String(willOpen));
+    }
+
+    /* 區域面板：左欄縣市單選 → 右欄只顯示該縣市的區 */
+    function showCity(c) {
+      selCity = c || '';
+      $$('.pk-col.cities .ct', form).forEach(function (b) {
+        b.classList.toggle('on', (b.getAttribute('data-city') || '') === selCity);
+      });
+      $$('.pk-col.areas .ck', form).forEach(function (l) {
+        var hit = selCity && l.getAttribute('data-city') === selCity;
+        l.classList.toggle('hide', !hit);
+        if (!hit) { var i = $('input', l); if (i) i.checked = false; }
+      });
+      syncAllBox();
+    }
+    function syncAllBox() {   // 「全區」＝該縣市底下一個區都沒勾
+      $$('.pk-col.areas .ck.all input', form).forEach(function (i) {
+        var c = i.parentNode.getAttribute('data-city');
+        var any = $$('.pk-col.areas .ck:not(.all)[data-city="' + c + '"] input:checked', form).length;
+        i.checked = !any;
+      });
+    }
+    $$('.pk-col.cities .ct', form).forEach(function (b) {
+      b.addEventListener('click', function () { showCity(b.getAttribute('data-city') || ''); });
+    });
+    $$('.pk-col.areas input', form).forEach(function (i) {
+      i.addEventListener('change', function () {
+        if (i.hasAttribute('data-all')) {         // 勾「全區」→ 清掉該縣市所有單區
+          var c = i.parentNode.getAttribute('data-city');
+          $$('.pk-col.areas .ck:not(.all)[data-city="' + c + '"] input', form).forEach(function (x) { x.checked = false; });
+          i.checked = true;
+        }
+        syncAllBox(); labels();
+      });
+    });
+
+    /* 總價：快選帶 ⇄ 自訂區間（互相同步，看得到自己選了什麼） */
+    $$('.pk-bands .bd', form).forEach(function (b) {
+      b.addEventListener('click', function () {
+        $$('.pk-bands .bd', form).forEach(function (x) { x.classList.remove('on'); });
+        b.classList.add('on');
+        form.pmin.value = b.getAttribute('data-min') || '';
+        form.pmax.value = b.getAttribute('data-max') || '';
+        labels();
+      });
+    });
+    ['pmin', 'pmax'].forEach(function (k) {
+      if (!form[k]) return;
+      form[k].addEventListener('input', function () { syncBands(); labels(); });
+    });
+    function syncBands() {
+      var lo = form.pmin ? form.pmin.value : '', hi = form.pmax ? form.pmax.value : '';
+      var found = false;
+      $$('.pk-bands .bd', form).forEach(function (b) {
+        var on = (b.getAttribute('data-min') || '') === lo && (b.getAttribute('data-max') || '') === hi;
+        b.classList.toggle('on', on); if (on) found = true;
+      });
+      if (!found) $$('.pk-bands .bd', form).forEach(function (b) { b.classList.remove('on'); });
+    }
+
+    $$('.pick .pk-pop select, .pick .pk-rows input', form).forEach(function (el) {
+      el.addEventListener('change', labels);
+    });
+
+    /* 鈕上的字：選了什麼就寫什麼（信義那樣），沒選就是「不限…」 */
+    function checked(name) {
+      return $$('.pk-rows input[name="' + name + '"]:checked, .pk-col.areas input[name="' + name + '"]:checked', form)
+        .map(function (i) { return $('span', i.parentNode).textContent; });
+    }
+    function txt(list, none, one) {
+      if (!list.length) return none;
+      return list.length === 1 ? (one ? one(list[0]) : list[0]) : list[0] + ' 等 ' + list.length + ' 項';
+    }
+    function labels() {
+      var lb = function (k) { var p = $('.pick[data-pick="' + k + '"] [data-lb]', form); return p; };
+      var a = checked('area');
+      lb('area').textContent = selCity ? (selCity + '・' + (a.length ? txt(a) : '全區')) : '全部縣市';
+      lb('type').textContent = txt(checked('type'), '不限類型');
+      lb('rooms').textContent = txt(checked('rooms'), '不限格局');
+      var lo = form.pmin ? form.pmin.value : '', hi = form.pmax ? form.pmax.value : '';
+      lb('price').textContent = (!lo && !hi) ? '不限總價'
+        : (lo ? fmt(+lo) : '0') + '～' + (hi ? fmt(+hi) + ' 萬' : '不限');
+      var extra = (form.mrt && form.mrt.value ? 1 : 0) + (form.sort && form.sort.value && form.sort.value !== 'new' ? 1 : 0);
+      lb('more').textContent = extra ? '更多（' + extra + '）' : '更多';
+    }
+
+    picks.forEach(function (p) {
+      $('.pk-btn', p).addEventListener('click', function (e) { e.stopPropagation(); open(p); });
+      var pop = $('.pk-pop', p);
+      pop.addEventListener('click', function (e) { e.stopPropagation(); });
+      var done = $('[data-done]', pop), clr = $('[data-clear]', pop);
+      if (done) done.addEventListener('click', function () { close(p); commit(); });
+      if (clr) clr.addEventListener('click', function () {
+        $$('input[type=checkbox]', pop).forEach(function (i) { i.checked = false; });
+        $$('input[type=number]', pop).forEach(function (i) { i.value = ''; });
+        $$('select', pop).forEach(function (s) { s.value = s.name === 'sort' ? 'new' : ''; });
+        if (p.getAttribute('data-pick') === 'area') { showCity(''); }
+        syncBands(); syncAllBox(); labels();
+      });
+    });
+    document.addEventListener('click', function () { closeAll(null); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeAll(null); });
+
+    function read() {          // DOM → 條件物件
+      var q = {};
+      if (selCity) q.city = selCity;
+      ['area', 'type', 'rooms'].forEach(function (k) {
+        var v = $$('input[name="' + k + '"]:checked', form)
+          .map(function (i) { return i.value; }).filter(Boolean);
+        if (v.length) q[k] = v;
+      });
+      if (form.pmin && form.pmin.value) q.pmin = form.pmin.value;
+      if (form.pmax && form.pmax.value) q.pmax = form.pmax.value;
+      if (form.mrt && form.mrt.value) q.mrt = form.mrt.value;
+      if (form.sort && form.sort.value && form.sort.value !== 'new') q.sort = form.sort.value;
+      return q;
+    }
+    function write(q) {        // 條件物件 → DOM
+      showCity(q.city || '');
+      $$('input[type=checkbox]', form).forEach(function (i) { if (!i.hasAttribute('data-all')) i.checked = false; });
+      ['area', 'type', 'rooms'].forEach(function (k) {
+        (q[k] || []).forEach(function (v) {
+          var i = form.querySelector('input[name="' + k + '"][value="' + v.replace(/"/g, '') + '"]');
+          if (i) { i.checked = true; if (k === 'area') { var l = i.parentNode; l.classList.remove('hide'); } }
+        });
+      });
+      if (form.pmin) form.pmin.value = q.pmin || '';
+      if (form.pmax) form.pmax.value = q.pmax || '';
+      if (form.mrt) form.mrt.value = q.mrt || '';
+      if (form.sort) form.sort.value = q.sort || 'new';
+      syncBands(); syncAllBox(); labels();
+    }
+    function commit() {
+      var q = read(), h = hashOf(q);
+      if (('#' + h) === location.hash || (!h && location.hash === '#all=1')) { onApply(); return; }
+      location.hash = h || 'all=1';    // 條件全清＝看全部，不要掉回預設的台北市大安區
+    }
+    var go = document.getElementById('dosearch');
+    if (go) go.addEventListener('click', function () { closeAll(null); commit(); });
+    return { read: read, write: write, commit: commit, closeAll: closeAll };
+  }
+
+  /* ══ 找房頁：hash → 篩選 → 渲染卡片 ══════════════════════════ */
   function filterIndex() {
     var box = $('#cards'); if (!box) return;
-    var form = $('#filters'), now = $('#nowtext'), data = null;
+    var form = $('#filters'), now = $('#nowtext');
     var dCity = form ? (form.getAttribute('data-city') || '') : '';
     var dArea = form ? (form.getAttribute('data-area') || '') : '';
-    var zipCity = {}, areaRows = [];
-    function parse() {
-      var o = {}; location.hash.replace(/^#/, '').split('&').forEach(function (kv) {
-        if (!kv) return; var p = kv.split('='); o[decodeURIComponent(p[0])] = decodeURIComponent(p[1] || '');
-      }); return o;
-    }
-    function hashOf(q) {
-      return KEYS.filter(function (k) { return q[k]; })
-        .map(function (k) { return k + '=' + encodeURIComponent(q[k]); }).join('&');
-    }
-    function buildCities() {
-      var cn = {}, an = {};
-      data.items.forEach(function (it) {
-        var c = it.ct || '';
-        if (c) cn[c] = (cn[c] || 0) + 1;
-        if (!it.z) return;
-        zipCity[it.z] = c;
-        if (!an[it.z]) an[it.z] = { z: String(it.z), c: c, a: it.a || String(it.z), n: 0 };
-        an[it.z].n++;
-      });
-      areaRows = Object.keys(an).map(function (k) { return an[k]; }).sort(function (a, b) { return b.n - a.n; });
-      if (!form || !form.city) return;
-      form.city.innerHTML = '<option value="">全部縣市</option>' + Object.keys(cn)
-        .sort(function (a, b) { return cn[b] - cn[a]; })
-        .map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + '（' + fmt(cn[c]) + '）</option>'; }).join('');
-    }
-    function buildAreas(city) {   // 區域下拉只留該縣市的區
-      if (!form || !form.area) return;
-      form.area.innerHTML = '<option value="">全部區域</option>' + areaRows
-        .filter(function (r) { return !city || r.c === city; })
-        .map(function (r) { return '<option value="' + esc(r.z) + '">' + esc(r.a) + '（' + fmt(r.n) + '）</option>'; }).join('');
-    }
-    function label(q, city) {     // 「目前顯示：台北市 大安區．295 件」那行
-      var t = [city || '全部縣市'];
-      ['area', 'type', 'rooms', 'mrt'].forEach(function (k) {
-        var s = form && form[k]; if (!s || !s.value) return;
-        var o = s.options[s.selectedIndex]; if (o) t.push(o.text.replace(/（[\d,]+）$/, ''));
-      });
-      if (q.pmin || q.pmax) t.push((q.pmin ? fmt(+q.pmin) + ' 萬' : '0') + '～' + (q.pmax ? fmt(+q.pmax) + ' 萬' : '不限'));
-      return t.join(' ');
-    }
+    var pk = form ? picker(form, function () { apply(); }) : null;
+
     function apply() {
-      if (!data) return;
-      var q = parse();
-      if (!location.hash.replace(/^#/, '') && (dCity || dArea)) {    // 沒帶條件 → 套預設，並寫進網址（可分享）
-        q = { city: dCity, area: dArea };
+      if (!INDEX) return;
+      var q = parseHash();
+      if (!location.hash.replace(/^#/, '') && (dCity || dArea)) {   // 沒帶條件 → 套預設並寫進網址（可分享）
+        q = { city: dCity, area: dArea ? [dArea] : [] };
         if (history.replaceState) history.replaceState(null, '', '#' + hashOf(q));
       }
-      var city = q.city || (q.area ? zipCity[q.area] || '' : '');
-      buildAreas(city);
-      if (form) {
-        KEYS.forEach(function (k) { if (form[k]) form[k].value = (k === 'city' ? city : q[k]) || ''; });
-        if (form.sort) form.sort.value = q.sort || 'new';
-      }
-      var rows = data.items.filter(function (it) {
-        if (q.city && it.ct !== q.city) return false;
-        if (q.area && String(it.z) !== q.area) return false;
-        if (q.type && it.t !== q.type) return false;
-        if (q.rooms) { var r = +it.r || 0; if (q.rooms === '4' ? r < 4 : r !== +q.rooms) return false; }
-        if (q.pmin && !(it.p >= +q.pmin)) return false;
-        if (q.pmax && !(it.p <= +q.pmax)) return false;
-        if (q.mrt && it.ms !== q.mrt) return false;
-        return true;
-      });
-      var s = q.sort || 'new';
-      rows.sort(function (a, b) {
-        if (s === 'plow') return (a.p || 1e12) - (b.p || 1e12);
-        if (s === 'phigh') return (b.p || 0) - (a.p || 0);
-        if (s === 'ulow') return (a.u || 1e12) - (b.u || 1e12);
-        if (s === 'big') return (b.pg || 0) - (a.pg || 0);
-        return (b.d || '') > (a.d || '') ? 1 : (b.d || '') < (a.d || '') ? -1 : 0;
-      });
+      if (pk) pk.write(q);
+      var rows = sortRows(INDEX.items.filter(matches(q)), q.sort || 'new');
       var PAGE = 60, shown = Math.min(rows.length, PAGE);
       function draw() {
-        box.innerHTML = (rows.slice(0, shown).map(card).join('') || '<p class="note">沒有符合條件的物件，換個條件試試，或直接 LINE 我們幫你找。</p>')
+        box.innerHTML = (rows.slice(0, shown).map(card).join('')
+          || '<p class="note">沒有符合條件的物件，換個條件試試，或直接 LINE 我們幫你找。</p>')
           + (shown < rows.length ? '<p class="more"><button type="button" class="btn-o" id="more">載入更多（還有 ' + (rows.length - shown) + ' 件）</button></p>' : '');
         var mb = document.getElementById('more');
         if (mb) mb.addEventListener('click', function () { shown = Math.min(rows.length, shown + PAGE); draw(); });
       }
       draw();
-      if (now) now.textContent = '目前顯示：' + label(q, city) + '．' + fmt(rows.length) + ' 件';
+      if (now) {
+        var lb = $$('.pick [data-lb]', form).map(function (e) { return e.textContent; })
+          .filter(function (t) { return t && t.indexOf('不限') !== 0 && t !== '更多'; });
+        now.textContent = '目前顯示：' + (lb.join('｜') || '全部在售物件') + '．' + fmt(rows.length) + ' 件';
+      }
     }
-    if (form) form.addEventListener('change', function (e) {
-      if (e.target && e.target.name === 'city' && form.area) form.area.value = '';   // 換縣市 → 區域重選
-      var q = {};
-      KEYS.forEach(function (k) { if (form[k] && form[k].value) q[k] = form[k].value; });
-      if (q.sort === 'new') delete q.sort;
-      location.hash = hashOf(q) || 'all=1';        // 全部「不限」＝看全部，不要掉回預設
-    });
     var sa = $('#showall');
     if (sa) sa.addEventListener('click', function (e) {
       e.preventDefault();
       if (location.hash.replace(/^#/, '') === 'all=1') apply(); else location.hash = 'all=1';
     });
     window.addEventListener('hashchange', apply);
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', BASE + '/listing/index.json', true);
-    xhr.onload = function () {
-      try { data = JSON.parse(xhr.responseText); } catch (e) { data = { items: [] }; }
-      buildCities();
-      apply();
-    };
-    xhr.onerror = function () { box.innerHTML = '<p class="note">物件清單載入失敗，請重新整理。</p>'; };
-    xhr.send();
+    loadIndex(function () { apply(); });
+  }
+
+  /* ══ 地圖找房：Leaflet（自架，非 CDN）＋國土測繪／OSM 圖磚 ═══════
+     ・圖釘座標是四捨五入到小數第 3 位的約略位置（≈110 公尺），不是門牌
+     ・同一格子裡多件 → 顯示件數泡泡，點下去放大；只剩 1 件 → 顯示價格泡泡
+     ・右欄只列「目前畫面看得到」的物件（拖曳、縮放都會重算） */
+  function mapView() {
+    var lay = document.getElementById('maplay'); if (!lay || !window.L) return;
+    var form = $('#filters'), box = document.getElementById('mapcards'), cnt = document.getElementById('mapcount');
+    var c = (lay.getAttribute('data-center') || '25.036,121.545').split(',');
+    var tiles = []; try { tiles = JSON.parse(lay.getAttribute('data-tiles') || '[]'); } catch (e) {}
+    var map = L.map('map', { center: [+c[0], +c[1]], zoom: +(lay.getAttribute('data-zoom') || 13), zoomControl: true });
+    var t0 = tiles[0] || {}, t1 = tiles[1];
+    var layer = L.tileLayer(t0.url, { maxZoom: t0.max || 19, attribution: t0.attr || '' }).addTo(map);
+    if (t1) {                       // 主圖磚掛掉自動換備援，客人不會看到一片灰
+      var swapped = false;
+      layer.on('tileerror', function () {
+        if (swapped) return; swapped = true;
+        map.removeLayer(layer);
+        L.tileLayer(t1.url, { maxZoom: t1.max || 19, attribution: t1.attr || '' }).addTo(map);
+      });
+    }
+    map.invalidateSize();          // 先量對容器大小，不然第一批圖磚只會蓋住畫面中間一小塊
+    var pins = L.layerGroup().addTo(map), rows = [], fitted = false;
+    var pk = form ? picker(form, function () { refilter(true); }) : null;
+
+    function bubble(html, cls, ll, onclick) {
+      var m = L.marker(ll, { icon: L.divIcon({ className: 'pinwrap', html: '<i class="' + cls + '">' + html + '</i>' }) });
+      m.on('click', onclick);
+      return m;
+    }
+    function draw() {
+      pins.clearLayers();
+      var z = map.getZoom(), b = map.getBounds();
+      var vis = rows.filter(function (it) { return it.g && b.contains([it.g[0], it.g[1]]); });
+      // 合併格子的邊長（度）：拉遠就變大，不然全台一次看時台北會擠成一坨疊在一起的泡泡
+      var cell = z >= 17 ? 0.0008 : z >= 16 ? 0.0016 : z >= 15 ? 0.003 : z >= 14 ? 0.006
+        : z >= 13 ? 0.012 : z >= 12 ? 0.03 : z >= 11 ? 0.06 : z >= 10 ? 0.12 : z >= 9 ? 0.25 : 0.6;
+      var grid = {};
+      vis.forEach(function (it) {
+        var k = Math.round(it.g[0] / cell) + ':' + Math.round(it.g[1] / cell);
+        (grid[k] = grid[k] || []).push(it);
+      });
+      Object.keys(grid).forEach(function (k) {
+        var g = grid[k], ll = [g[0].g[0], g[0].g[1]];
+        if (g.length === 1) {
+          var it = g[0];
+          pins.addLayer(bubble(it.p ? fmt(it.p) + '萬' : '洽詢', 'pin', ll, function () {
+            L.popup({ className: 'mapop', maxWidth: 260, autoPanPadding: [20, 20] })
+              .setLatLng(ll).setContent(card(it)).openOn(map);
+          }));
+        } else {
+          var la = 0, lo = 0;
+          g.forEach(function (x) { la += x.g[0]; lo += x.g[1]; });
+          pins.addLayer(bubble(g.length + ' 件', 'pin n', [la / g.length, lo / g.length], function () {
+            map.setView([la / g.length, lo / g.length], Math.min(map.getZoom() + 2, 18));
+          }));
+        }
+      });
+      var list = vis.slice(0, 60);
+      box.innerHTML = list.map(card).join('') || '<p class="note">這個範圍內沒有物件，把地圖拉遠一點看看。</p>';
+      cnt.textContent = '此範圍內 ' + fmt(vis.length) + ' 件' + (vis.length > list.length ? '（先列 60 件）' : '');
+    }
+    function refilter(recentre) {
+      var q = parseHash();
+      if (!location.hash.replace(/^#/, '') && form) {
+        var dc = form.getAttribute('data-city') || '', da = form.getAttribute('data-area') || '';
+        if (dc || da) {
+          q = { city: dc, area: da ? [da] : [] };
+          if (history.replaceState) history.replaceState(null, '', '#' + hashOf(q));
+        }
+      }
+      if (pk) pk.write(q);
+      rows = sortRows(INDEX.items.filter(matches(q)), q.sort || 'new').filter(function (it) { return it.g; });
+      if (rows.length && (!fitted || recentre)) {
+        fitted = true;
+        map.fitBounds(rows.map(function (it) { return [it.g[0], it.g[1]]; }), { padding: [30, 30], maxZoom: 16 });
+      }
+      draw();
+    }
+    map.on('moveend zoomend', draw);
+    window.addEventListener('hashchange', function () { refilter(true); });
+    $$('.maptabs button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        $$('.maptabs button').forEach(function (x) { x.classList.remove('on'); });
+        b.classList.add('on');
+        lay.setAttribute('data-view', b.getAttribute('data-tab'));
+        if (b.getAttribute('data-tab') === 'map') setTimeout(function () { map.invalidateSize(); }, 50);
+      });
+    });
+    loadIndex(function () { map.invalidateSize(); refilter(true); });
+    window.addEventListener('load', function () { map.invalidateSize(); });
   }
 
   /* ── 首頁搜尋表單 → 組 hash 導向 /listing/#… ── */
@@ -243,6 +476,6 @@
     t();
   }
 
-  function init() { lightbox(); loan(); loanTool(); videoLite(); filterIndex(); homeSearch(); fab(); }
+  function init() { lightbox(); loan(); loanTool(); videoLite(); filterIndex(); mapView(); homeSearch(); fab(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

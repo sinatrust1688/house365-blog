@@ -159,9 +159,94 @@ table.facts tr:last-child th,table.facts tr:last-child td{border-bottom:0}
 .lb .n{right:8px;top:50%;transform:translateY(-50%)}
 .lb .c{position:absolute;bottom:14px;left:0;right:0;text-align:center;color:#ddd;font-size:14px}
 /* 找房 index / 分面 / 首頁 */
-.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin:12px 0}
-.filters label{font-size:12.5px;color:var(--mute);display:block}
-.filters select{width:100%;font-size:15px;padding:6px 6px;border:1px solid #ccc;border-radius:8px;background:#fff;font-family:inherit}
+/* 篩選列（信義式下拉面板）：一排白色圓角鈕，點開浮出面板；手機上橫向捲動 */
+.fbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;margin:12px 0}
+.pick{position:relative}
+.pk-btn{display:flex;align-items:center;gap:6px;max-width:230px;font-family:inherit;font-size:14.5px;color:var(--ink);background:#fff;border:1px solid #d6dbd8;border-radius:9px;padding:8px 12px;cursor:pointer;line-height:1.4}
+.pk-btn b{font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pk-btn:hover{border-color:var(--g);color:var(--g)}
+.pk-btn[aria-expanded=true]{border-color:var(--g);color:var(--g);box-shadow:0 0 0 2px var(--g2)}
+.cav{width:0;height:0;border:4px solid transparent;border-top-color:currentColor;margin-top:3px;flex:0 0 auto}
+.pk-pop{position:absolute;z-index:40;top:calc(100% + 6px);left:0;min-width:250px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.13);padding:12px}
+.pick.wide .pk-pop{min-width:min(560px,92vw)}
+.pk-two{display:grid;grid-template-columns:126px 1fr;gap:10px;max-height:52vh}
+.pk-col{overflow-y:auto;max-height:52vh}
+.pk-col.cities{border-right:1px solid var(--line2);padding-right:6px}
+.ct{display:flex;justify-content:space-between;gap:6px;width:100%;text-align:left;font-family:inherit;font-size:14px;background:none;border:0;border-radius:7px;padding:7px 8px;cursor:pointer;color:var(--ink)}
+.ct b{font-weight:400;color:var(--mute);font-size:12.5px}
+.ct:hover{background:var(--line2)}
+.ct.on{background:var(--g2);color:var(--g);font-weight:700}
+.pk-col.areas{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:2px;align-content:start}
+.ck{display:flex;align-items:center;gap:6px;font-size:14px;padding:6px 7px;border-radius:7px;cursor:pointer}
+.ck:hover{background:var(--line2)}
+.ck b{font-weight:400;color:var(--mute);font-size:12px}
+.ck.hide{display:none}
+.ck.all{grid-column:1/-1;font-weight:700;border-bottom:1px solid var(--line2);border-radius:0}
+.pk-rows{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:2px;max-height:52vh;overflow-y:auto}
+.pk-rows .rw{display:flex;align-items:center;gap:8px;grid-column:1/-1;font-size:14px;padding:4px 0}
+.pk-rows .rw span{flex:0 0 62px;color:var(--mute);font-size:13px}
+.pk-rows .rw select{flex:1;font-family:inherit;font-size:14.5px;padding:6px;border:1px solid #ccc;border-radius:8px;background:#fff}
+.pk-bands{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.bd{font-family:inherit;font-size:13.5px;background:#f6f7f6;border:1px solid transparent;border-radius:7px;padding:8px 4px;cursor:pointer;color:var(--ink)}
+.bd:hover{border-color:var(--g)}
+.bd.on{background:var(--g2);border-color:var(--g);color:var(--g);font-weight:700}
+.pk-range{display:flex;align-items:center;gap:6px;margin-top:10px}
+.pk-range input{width:100%;min-width:0;font-family:inherit;font-size:14.5px;padding:7px;border:1px solid #ccc;border-radius:8px}
+.pk-range .u{color:var(--mute);font-size:13px;flex:0 0 auto}
+.pk-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:1px solid var(--line2);margin-top:10px;padding-top:9px}
+.pk-foot .lnk{background:none;border:0;font-family:inherit;font-size:13.5px;color:var(--mute);cursor:pointer;text-decoration:underline}
+.btn-s{font-family:inherit;font-size:14px;background:var(--g);color:#fff;border:0;border-radius:8px;padding:7px 18px;cursor:pointer;font-weight:700}
+.fbar .go{font-family:inherit;font-size:15px;background:var(--g);color:#fff;border:0;border-radius:9px;padding:9px 24px;cursor:pointer;font-weight:700}
+.fbar .mapbtn{margin-left:auto;font-size:14px;text-decoration:none;color:var(--g);border:1px solid var(--g);border-radius:9px;padding:8px 14px;white-space:nowrap}
+@media(max-width:640px){
+  .fbar{gap:6px;padding:8px}
+  .pk-btn{font-size:13.5px;padding:7px 9px;max-width:44vw}
+  .pk-pop{position:fixed;left:8px;right:8px;top:auto;min-width:0;width:auto;max-height:74vh;overflow-y:auto}
+  .pick.wide .pk-pop{min-width:0}
+  .pk-two{grid-template-columns:104px 1fr}
+  .fbar .go{flex:1 1 42%;padding:9px 10px;white-space:nowrap}
+  .fbar .mapbtn{flex:1 1 42%;margin-left:0;text-align:center}
+}
+/* 地圖找房 /listing/map/ */
+.maptabs{display:none;gap:6px;margin:4px 0 8px}
+.maptabs button{flex:1;font-family:inherit;font-size:14.5px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px;cursor:pointer}
+.maptabs button.on{background:var(--g);color:#fff;border-color:var(--g);font-weight:700}
+.maplay{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;margin:8px 0 12px}
+#map{height:min(74vh,680px);border-radius:12px;border:1px solid var(--line);background:#eef1ef;z-index:1}
+.mapside{border:1px solid var(--line);border-radius:12px;background:var(--card);display:flex;flex-direction:column;max-height:min(74vh,680px)}
+.mapside .mh{padding:10px 12px;border-bottom:1px solid var(--line2)}
+.mapside .mh b{display:block;font-size:15px;color:var(--g)}
+.mapside .mh .small{font-size:12px;color:var(--mute);line-height:1.5}
+#mapcards{overflow-y:auto;padding:10px;margin:0}
+.cards.mini{grid-template-columns:1fr;gap:9px;grid-auto-rows:max-content;align-content:start;align-items:start}
+/* ⚠ grid-auto-rows 一定要寫死 max-content：這個格線在一個限高、可捲動的欄位裡，
+   而卡片是 overflow:hidden（＝最小高度算 0），auto 列會被壓成只剩邊框 2px、整排看起來空白（2026-08-20 踩過）。 */
+.cards.mini .card{display:grid;grid-template-columns:104px 1fr;gap:9px}
+.cards.mini .card .ph{aspect-ratio:4/3}
+.cards.mini .card .bd{padding:6px 8px 6px 0}
+.pinwrap{background:none;border:0}
+.pin{display:inline-block;font-style:normal;font-size:12.5px;font-weight:700;color:#fff;background:var(--g);border:1.5px solid #fff;border-radius:999px;padding:3px 9px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.28);transform:translate(-50%,-50%);cursor:pointer}
+.pin.n{background:#3a5ba0}
+.pin:hover{background:#0f4f29}
+.mapop .leaflet-popup-content{margin:0;width:230px!important}
+.mapop .leaflet-popup-content-wrapper{padding:0;overflow:hidden;border-radius:12px}
+.mapop .card{border:0}
+@media(max-width:900px){
+  .maptabs{display:flex}
+  .maplay{grid-template-columns:1fr}
+  #map{height:62vh}
+  .mapside{max-height:none}
+  #mapcards{max-height:none}
+  .maplay[data-view=list] #map{display:none}
+  .maplay:not([data-view=list]) .mapside{display:none}
+}
+/* 頁尾社群 */
+.socials{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:0 0 12px}
+.socials .so-t{font-size:13px;color:var(--mute)}
+.so{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 10px;border-radius:999px;color:#fff;text-decoration:none;font-size:13px;font-weight:700;line-height:1}
+.so.fb{background:#1877f2}.so.ig{background:#c13584}.so.yt{background:#ff0000}
+.so.th{background:#000}.so.line{background:var(--line-green)}
+.so:hover{opacity:.85}
 /* 找房頁「目前顯示 台北市 大安區．295 件／看全部」列 */
 .nowbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:10px 0 6px;
 padding:10px 14px;background:var(--g2);border-radius:10px;font-size:14.5px;color:var(--g);line-height:1.5}
@@ -208,7 +293,7 @@ border:1px solid var(--line);background:var(--card);transition:box-shadow .15s}
 .ways .way b{display:block;font-size:20px;color:var(--g);margin-bottom:4px}
 .ways .way span{color:var(--mute);font-size:14.5px;line-height:1.6}
 .ways .way.sell{background:var(--g2);border-color:#cfe0d6}
-@media(min-width:700px){.ways{grid-template-columns:repeat(2,1fr);gap:16px}}
+@media(min-width:700px){.ways{grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}}
 /* 右下角浮動 LINE 圓鈕（捲一段才淡入，不一開始就擋內容；手機讓開底部固定列） */
 .fab-line{position:fixed;right:18px;bottom:24px;z-index:60;width:56px;height:56px;border-radius:50%;
 background:var(--line-green);color:#fff;font-weight:700;font-size:12.5px;letter-spacing:.5px;text-decoration:none;
