@@ -91,3 +91,16 @@ box-shadow:0 2px 12px rgba(0,0,0,.10)}
   .bignum b{font-size:31px}
   .timeline{min-width:0}
 }
+
+/* 關於我們：兩人的年資／服務區域／擅長物件小標籤（官網內容資料夾填了才出） */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 8px}
+.chip{background:var(--g2);color:var(--g);border-radius:999px;padding:3px 11px;font-size:12.5px;line-height:1.7}
+.chip b{font-weight:700;margin-right:5px}
+/* 關於我們：成交案例 */
+.cases{display:grid;grid-template-columns:1fr;gap:12px;margin:8px 0}
+.case{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.case > b{display:block;font-size:16.5px;color:var(--g);margin-bottom:8px;line-height:1.5}
+.case p{margin:0 0 6px;font-size:14.5px;line-height:1.75}
+.case p:last-child{margin-bottom:0}
+.case p span{display:inline-block;min-width:6em;color:var(--mute);font-size:13px}
+@media(min-width:760px){.cases{grid-template-columns:repeat(2,1fr)}}
