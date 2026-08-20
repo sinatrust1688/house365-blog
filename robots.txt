@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /img/homepage/
 Disallow: /img/social/
-Sitemap: https://sinatrust1688.github.io/house365-blog/sitemap.xml
+Sitemap: https://house365.tw/sitemap.xml
