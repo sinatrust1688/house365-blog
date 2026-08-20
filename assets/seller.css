@@ -93,6 +93,8 @@ box-shadow:0 2px 12px rgba(0,0,0,.10)}
 }
 
 /* 關於我們：兩人的年資／服務區域／擅長物件小標籤（官網內容資料夾填了才出） */
+.bio-name{font-weight:700;color:var(--g);margin:18px 0 6px;font-size:16px}
+.about-2col .txt + * .bio-name,.chips + p{margin-top:0}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 8px}
 .chip{background:var(--g2);color:var(--g);border-radius:999px;padding:3px 11px;font-size:12.5px;line-height:1.7}
 .chip b{font-weight:700;margin-right:5px}
