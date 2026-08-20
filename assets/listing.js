@@ -99,7 +99,9 @@
 
   /* ── 卡片（找房頁／地圖頁 JS 渲染；與 listing_render.card_html 同形） ── */
   function card(it) {
-    var cover = it.ph || NOPHOTO, ref = /hbhousing\.com\.tw/.test(cover) ? ' referrerpolicy="no-referrer"' : '';
+    // ⚠️ 住商圖床看 Referer 給圖：不帶來源只給 383×287 縮圖，帶來源才給 738×553 原圖。
+    //    不可以改回 no-referrer（見 listing_render._img 的說明）。
+    var cover = it.ph || NOPHOTO, ref = /hbhousing\.com\.tw/.test(cover) ? ' referrerpolicy="origin"' : '';
     var meta = [it.a, it.tl, it.r ? it.r + '房' : '', it.pg ? it.pg + '坪' : ''].filter(Boolean).join('｜');
     return '<a class="card" href="' + BASE + '/listing/' + esc(String(it.c).toLowerCase()) + '.html">' +
       '<div class="ph"><img src="' + esc(cover) + '" alt="' + esc(it.n) + '" loading="lazy" decoding="async"' + ref +
