@@ -75,7 +75,8 @@ p{margin:0 0 1em}
 .cta-bar{display:none}
 @media(max-width:768px){
   .cta-bar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--card);border-top:1px solid var(--line);padding:8px 10px calc(8px + env(safe-area-inset-bottom));gap:8px;box-shadow:0 -2px 12px rgba(0,0,0,.08)}
-  .cta-bar a{flex:1;text-align:center;color:#fff;font-weight:700;text-decoration:none;padding:11px 4px;border-radius:9px;font-size:15px;background:var(--line-green)}
+  /* 三顆（LINE＋兩位電話）要塞進 360px 的手機：字級縮一點、左右內距收窄、不換行 */
+  .cta-bar a{flex:1;min-width:0;text-align:center;color:#fff;font-weight:700;text-decoration:none;padding:11px 2px;border-radius:9px;font-size:14.5px;white-space:nowrap;background:var(--line-green)}
   .cta-bar a.tel{background:var(--g)}
   .cta-bar a.book{background:var(--blue)}
   .l-side .cta-btns{display:none}
