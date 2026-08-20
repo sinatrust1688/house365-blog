@@ -6,6 +6,9 @@
 .sell-hero p{font-size:17px}
 .sell-hero .cta-btns{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 0;grid-column:1}
 .sell-hero .btn{flex:1 1 220px;margin:0;padding:12px 10px}
+/* 兩顆電話鈕自成一列、內部對半分 → 永遠一樣大（不會一顆獨佔整列） */
+.sell-hero .tels{flex:1 1 100%;gap:10px}
+.sell-hero .tels .btn{flex:none;padding:12px 10px}
 .sell-hero .btn.tel{background:#fff;color:var(--g)}
 
 /* 三顆信任錨 */
@@ -77,6 +80,8 @@ box-shadow:0 2px 12px rgba(0,0,0,.10)}
 /* 兩顆鈕排成一排（行情入口用；hero 另有自己的規則） */
 .btn-row{display:flex;flex-wrap:wrap;gap:10px;max-width:620px}
 .btn-row .btn{flex:1 1 240px;margin:8px 0 0}
+.btn-row .tels{flex:1 1 100%;gap:10px;margin:8px 0 0}
+.btn-row .tels .btn{flex:none;margin:0}
 
 @media(min-width:760px){
   .anchors{grid-template-columns:repeat(3,1fr)}

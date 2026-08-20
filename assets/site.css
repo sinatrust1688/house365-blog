@@ -68,9 +68,15 @@ p{margin:0 0 1em}
 .price-card .code{margin:10px 0 4px;padding:8px 10px;background:var(--g2);border-radius:8px;font-size:14px;color:var(--g);font-weight:700}
 .price-card .note{color:var(--mute);font-size:12.5px;margin:6px 0 0}
 .price-card .cta-btns{margin-top:12px}
+.price-card .tels{grid-template-columns:1fr;gap:8px;margin:8px 0}
 .btn{display:block;text-align:center;background:var(--line-green);color:#fff;font-weight:700;padding:11px;border-radius:9px;text-decoration:none;margin:8px 0}
 .btn.tel{background:var(--g)}
 .btn.book{background:var(--blue)}
+/* 兩位的電話鈕永遠一樣大（使用者 2026-08-20：「電話要一樣大，不然是要吵架嗎」）。
+   包成 grid 就不會像 flex 那樣換行後一顆獨佔整列、變成一大一小。 */
+.tels{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tels .btn{margin:0;min-width:0}
+@media(max-width:520px){.tels{grid-template-columns:1fr}}
 /* 手機底部 CTA */
 .cta-bar{display:none}
 @media(max-width:768px){
