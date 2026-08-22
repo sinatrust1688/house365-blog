@@ -42,8 +42,27 @@
     }
     function close() { if (!lb) return; document.body.removeChild(lb); lb = null; document.body.style.overflow = ''; document.removeEventListener('keydown', key); }
     if (main) main.addEventListener('click', function () { open(+(main.getAttribute('data-i') || 0)); });
+
+    /* 直式照片：整張放進去（CSS 的 .tall → object-fit:contain），左右用同一張照片模糊當底。
+       只有主圖這樣，卡片維持裁切。每次換主圖都要重跑，不然換到直式照片還是被切。 */
+    function fitMain() {
+      if (!main) return;
+      var box = main.parentNode;
+      var apply = function () {
+        var tall = main.naturalWidth && main.naturalHeight > main.naturalWidth * 1.02;
+        box.classList.toggle('tall', !!tall);
+        var src = main.currentSrc || main.src;
+        box.style.setProperty('--bgimg', tall ? 'url("' + src.replace(/"/g, '%22') + '")' : 'none');
+      };
+      if (main.complete && main.naturalWidth) apply();
+      main.addEventListener('load', apply);
+    }
+    fitMain();
+
     $$('.thumbs button', g).forEach(function (b, i) {
       b.addEventListener('click', function () {
+        // 最後一顆「+N 張」是開燈箱，不是換主圖（原本沿用換主圖的事件，點下去什麼也沒發生）
+        if (b.classList.contains('more')) { open(+(b.getAttribute('data-i') || 0)); return; }
         var idx = +b.getAttribute('data-i');
         if (main && photos[idx]) { main.src = photos[idx]; main.setAttribute('data-i', idx); }
         $$('.thumbs button', g).forEach(function (x) { x.classList.remove('on'); }); b.classList.add('on');
@@ -103,10 +122,16 @@
     //    不可以改回 no-referrer（見 listing_render._img 的說明）。
     var cover = it.ph || NOPHOTO, ref = /hbhousing\.com\.tw/.test(cover) ? ' referrerpolicy="origin"' : '';
     var meta = [it.a, it.tl, it.r ? it.r + '房' : '', it.pg ? it.pg + '坪' : ''].filter(Boolean).join('｜');
+    // 第三層：樓層・屋齡（和 listing_render.card_html 的 meta2 同一套，改一邊就要改另一邊）
+    var meta2 = [it.f || '', it.y ? it.y + ' 年' : ''].filter(Boolean).join('・');
+    // 照片角標：左上「新上架」（nw＝委託起日 ≤14 天）、左下捷運站
+    var tags = (it.nw ? '<span class="tg new">新上架</span>' : '') +
+               (it.m ? '<span class="tg mrt">' + esc(it.m) + '站</span>' : '');
     return '<a class="card" href="' + BASE + '/listing/' + esc(String(it.c).toLowerCase()) + '.html">' +
       '<div class="ph"><img src="' + esc(cover) + '" alt="' + esc(it.n) + '" loading="lazy" decoding="async"' + ref +
-      ' onerror="this.onerror=null;this.src=\'' + NOPHOTO + '\'"></div>' +
+      ' onerror="this.onerror=null;this.src=\'' + NOPHOTO + '\'">' + tags + '</div>' +
       '<div class="bd"><span class="nm">' + esc(it.n) + '</span><div class="mt">' + esc(meta) + '</div>' +
+      (meta2 ? '<div class="mt2">' + esc(meta2) + '</div>' : '') +
       '<div class="pr">' + (it.p ? fmt(it.p) + ' 萬' : '價格洽詢') + (it.u ? '<small>' + it.u + ' 萬/坪</small>' : '') + '</div></div></a>';
   }
 
@@ -152,6 +177,9 @@
       if (s === 'phigh') return (b.p || 0) - (a.p || 0);
       if (s === 'ulow') return (a.u || 1e12) - (b.u || 1e12);
       if (s === 'big') return (b.pg || 0) - (a.pg || 0);
+      // 「最新上架」：先看 nw（委託起日 ≤14 天，這才是真的新），同組再看 d（本站第一次看到的日子）。
+      // 只用 d 排不行——本站 2026-08-18 上線，1,614 件裡有 1,577 件的 d 都是那一天，等於沒排。
+      if ((b.nw || 0) !== (a.nw || 0)) return (b.nw || 0) - (a.nw || 0);
       return (b.d || '') > (a.d || '') ? 1 : (b.d || '') < (a.d || '') ? -1 : 0;
     });
   }

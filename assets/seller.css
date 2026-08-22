@@ -13,8 +13,10 @@
 
 /* 三顆信任錨 */
 .anchors{display:grid;grid-template-columns:1fr;gap:10px;margin:10px 0 4px}
-.anchors > div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 14px;text-align:center}
-.anchors b{display:block;font-size:30px;font-weight:800;color:var(--g);line-height:1.2;letter-spacing:.5px}
+.anchors > div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+.anchors b{display:block;font-size:var(--fs-num);font-weight:700;color:var(--g);line-height:1.15;letter-spacing:-.3px}
+/* 數字大、單位小：以前「22,691 張」的「張」跟數字一樣高一樣粗，中文筆畫重會把焦點從數字上搶走 */
+.anchors b small,.bignum b small{font-size:.55em;font-weight:700;margin-left:4px;letter-spacing:0}
 .anchors span{display:block;color:var(--mute);font-size:14px;margin-top:4px;line-height:1.55}
 
 /* 步驟清單（3 行濃縮版與 10 步共用；整句是定稿文案，不切斷成標題＋內文） */
@@ -53,8 +55,8 @@ border:1px solid var(--line);border-radius:12px;font-size:15px}
 
 /* 戰報：四格大字 */
 .statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0 8px}
-.bignum{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 14px;text-align:center}
-.bignum b{display:block;font-size:27px;font-weight:800;color:var(--g);line-height:1.2}
+.bignum{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+.bignum b{display:block;font-size:var(--fs-num);font-weight:700;color:var(--g);line-height:1.15;letter-spacing:-.3px}
 .bignum span{display:block;color:var(--mute);font-size:13.5px;margin-top:3px}
 
 
@@ -66,10 +68,10 @@ border:1px solid var(--line);border-radius:12px;font-size:15px}
 padding:16px;color:var(--mute);font-size:14.5px;margin:8px 0}
 
 /* FAQ */
-.faq details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 16px;margin:0 0 9px}
+.faq details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin:0 0 9px}
 .faq summary{font-weight:700;cursor:pointer;list-style:none}
 .faq summary::-webkit-details-marker{display:none}
-.faq summary:before{content:"＋ ";color:var(--g);font-weight:800}
+.faq summary:before{content:"＋ ";color:var(--g);font-weight:700}
 .faq details[open] summary:before{content:"− "}
 .faq p{margin:9px 0 0;color:#444;font-size:15px}
 
@@ -88,7 +90,7 @@ box-shadow:0 2px 12px rgba(0,0,0,.10)}
   /* 標籤欄放寬（「生活機能實測覆蓋率」9 個字）；手機維持 site.css 的 7em 才不會擠 */
   table.facts.rep th{width:12em;white-space:nowrap}
   .statgrid{grid-template-columns:repeat(4,1fr)}
-  .bignum b{font-size:31px}
+  .bignum b{font-size:var(--fs-num)}
   .timeline{min-width:0}
 }
 

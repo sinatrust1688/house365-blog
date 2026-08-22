@@ -2,32 +2,65 @@
    與 blog_build.CSS 同色系（#1b6b3a 綠）；手機優先，≥900px 兩欄。
    2026-08-18 使用者選定「A＋C 混合」：保留品牌綠，改細線／大留白／高行距（質感），
    不改版面結構與資訊順序——換風格只動本檔，1,589 頁隔天自動套用。 */
-:root{--g:#1b6b3a;--g2:#e8f3ec;--ink:#222;--mute:#64748b;--line:#ebedec;--line2:#f2f4f3;--bg:#fbfbf9;--card:#fff;--line-green:#06c755;--blue:#3a5ba0;--red:#c0392b}
+:root{
+  /* 品牌綠五階（2026-08-21）。以前有 9 個手寫的「差不多的綠」散在各處，色相從 141° 飄到 158°，
+     單看每個都沒錯、放在一起就是說不上哪裡怪。要用綠一律從這裡取。 */
+  --g-900:#0f4f29;   /* 按下 */
+  --g-800:#155a30;   /* 主鈕 hover */
+  --g:#1b6b3a;       /* 主色 */
+  --g-500:#2c8a50;   /* 漸層尾、次要強調 */
+  --g-200:#cfe0d6;   /* 淡底上的邊框 */
+  --g2:#e8f3ec;      /* 淡底 */
+  --g-50:#f3f8f5;    /* 列 hover 底 */
+  /* 中性色：全部帶一點綠，跟品牌同色溫。--mute 原為 #64748b（偏藍的套件預設灰），
+     在淺綠底上對比只有 4.18 不及格；改成綠灰後白底 5.71／米底 5.51／淺綠底 5.02，三種底都過 AA。 */
+  --ink:#222; --ink2:#3f4a44; --mute:#5b6a61; --faint:#9aa39e;
+  --line:#e3e7e3; --line2:#f2f4f3; --line-strong:#d6dbd8;
+  --bg:#f6f7f4;      /* 原 #fbfbf9 與卡片白只差 1.04 倍，卡片浮不起來 */
+  --card:#fff; --line-green:#06c755; --blue:#3a5ba0; --red:#c0392b;
+  /* 字級尺。以前全站 23 種字級（12/12.5/13/13.5/14/14.5/15/15.5…32），差 0.5px 肉眼分不出，
+     只會讓版面「說不出哪裡怪」。新增字級一律從這裡挑。
+     ⚠️ --fs-data 這一級不可刪：表格／戰報／FAQ／案例用，拿掉會讓手機表格變胖、失去層級。 */
+  --fs-xs:12.5px; --fs-sm:13.5px; --fs-ui:14.5px; --fs-data:15px;
+  --fs-body:16.5px; --fs-lg:18px; --fs-h2:20px; --fs-h1:26px; --fs-num:32px;
+}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;font-family:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;font-size:16.5px;line-height:1.85;letter-spacing:.2px;color:var(--ink);background:var(--bg)}
 a{color:var(--g)}
 img{max-width:100%}
-h1{font-size:25px;line-height:1.4;margin:14px 0 6px;font-weight:700;letter-spacing:.5px}
-h2{font-size:17.5px;margin:40px 0 14px;padding-left:11px;border-left:3px solid var(--g);line-height:1.35;letter-spacing:1.2px;font-weight:700}
+h1{font-size:var(--fs-h1);line-height:1.35;margin:16px 0 8px;font-weight:700;letter-spacing:.3px}
+/* h2 原本左邊一條 3px 綠線，一頁 8 個 h2 就是 8 條綠線在搶眼睛。改成細底線：
+   標題照樣分得出段落，綠色留給真正要按的東西（LINE、電話）。 */
+h2{font-size:var(--fs-h2);margin:48px 0 16px;padding:0 0 10px;border-bottom:1px solid var(--line);line-height:1.3;letter-spacing:.4px;font-weight:700}
 p{margin:0 0 1em}
-.wrap{max-width:1040px;margin:0 auto;padding:0 18px 96px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 18px 64px}
 /* header / footer */
-.site-header{background:var(--card);border-bottom:2px solid var(--g)}
+.site-header{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:70;box-shadow:0 1px 0 rgba(20,40,28,.04)}
 .site-header .in{max-width:1080px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .brand{color:var(--g);text-decoration:none;font-weight:700;font-size:18px;white-space:nowrap}
 .nav{display:flex;gap:4px;flex-wrap:wrap}
-.nav a{color:var(--ink);text-decoration:none;font-size:14px;padding:5px 10px;border-radius:6px}
-.nav a.on,.nav a:hover{background:var(--g2);color:var(--g)}
-.nav a.line{background:var(--line-green);color:#fff;font-weight:700}
-.site-footer{color:#666;font-size:13px;line-height:1.7;border-top:1px solid var(--line);padding:16px 0 20px;margin-top:36px}
-.site-footer .legal{color:#555}
+.nav a{color:var(--ink);text-decoration:none;font-size:var(--fs-ui);padding:6px 10px;border-radius:8px}
+.nav a.on{color:var(--g);font-weight:700;box-shadow:inset 0 -2px 0 var(--g);border-radius:0}
+@media(hover:hover){.nav a:hover{background:var(--g2);color:var(--g)}}
+/* 導覽列 LINE：原本整顆亮綠實心，在每一頁的右上角搶走「找房／賣房」的注意力。改淡底膠囊。 */
+.nav a.line{background:#e6f9ee;color:#047a3a;font-weight:700}
+@media(hover:hover){.nav a.line:hover{background:var(--line-green);color:#fff}}
+.site-footer{color:var(--mute);font-size:var(--fs-sm);line-height:1.8;border-top:1px solid var(--line);padding:24px 0 20px;margin-top:48px;display:flex;flex-direction:column;gap:12px}
+.site-footer .legal{color:var(--ink2);max-width:720px}
 /* 麵包屑 / 徽章 */
-.crumb{font-size:13px;color:var(--mute);margin:12px 0 8px;overflow-x:auto;white-space:nowrap}
+.crumb{font-size:var(--fs-sm);color:var(--mute);margin:12px 0 8px;overflow-x:auto;white-space:nowrap}
 .crumb a{color:var(--mute);text-decoration:none}
 .crumb a:hover{color:var(--g)}
-.sub{color:#555;font-size:15px;margin:0 0 8px}
-.badges{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.sub{color:var(--ink2);font-size:var(--fs-data);margin:0 0 8px}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+/* 關鍵數據帶：買方最先問的六件事。桌機 3 欄、手機 2 欄；細線分隔不畫框，
+   免得和底下的基本資料表看起來像兩個一樣的東西。 */
+.keyfacts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:16px 0 0}
+.keyfacts>div{background:var(--card);padding:12px 14px;min-width:0}
+.keyfacts span{display:block;color:var(--mute);font-size:var(--fs-xs);line-height:1.4}
+.keyfacts b{display:block;font-size:var(--fs-lg);color:var(--ink);font-weight:700;line-height:1.3;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(min-width:600px){.keyfacts{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .badge{display:inline-block;background:var(--g2);color:var(--g);font-size:12.5px;padding:4px 11px;border-radius:999px;white-space:nowrap;letter-spacing:.5px}
 .badge.hot{background:#fdecea;color:var(--red)}
 /* 兩欄 */
@@ -42,12 +75,19 @@ p{margin:0 0 1em}
 }
 /* 相簿 */
 .gallery{margin:0 0 4px}
-.gallery .main{position:relative;aspect-ratio:4/3;background:#eee;border-radius:12px;overflow:hidden;cursor:zoom-in}
-.gallery .main img{width:100%;height:100%;object-fit:cover;display:block}
-.gallery .count{position:absolute;right:10px;bottom:10px;background:rgba(0,0,0,.6);color:#fff;font-size:13px;padding:3px 10px;border-radius:999px;border:0;cursor:pointer}
+.gallery .main{position:relative;aspect-ratio:4/3;background:#eef4f0;border-radius:12px;overflow:hidden;cursor:zoom-in}
+.gallery .main img{width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:1}
+.gallery .main.tall img{object-fit:contain}
+.gallery .main.tall::before{content:"";position:absolute;inset:-8%;background-image:var(--bgimg);background-size:cover;background-position:center;filter:blur(26px) saturate(1.15) brightness(.92);z-index:0}
+/* z-index:2 是必要的：主圖為了讓模糊底墊在後面而拿到 z-index:1，沒有這行「看全部 N 張」會被主圖蓋掉（2026-08-21 實測看不見了）。 */
+.gallery .count{position:absolute;z-index:2;right:10px;bottom:10px;background:rgba(0,0,0,.6);color:#fff;font-size:13px;padding:3px 10px;border-radius:999px;border:0;cursor:pointer}
 .thumbs{display:flex;gap:6px;overflow-x:auto;padding:8px 0 4px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
-.thumbs button{flex:0 0 96px;aspect-ratio:4/3;padding:0;border:2px solid transparent;border-radius:8px;overflow:hidden;background:#eee;cursor:pointer}
+.thumbs button{flex:0 0 96px;aspect-ratio:4/3;padding:0;border:2px solid transparent;border-radius:8px;overflow:hidden;background:#eef4f0;cursor:pointer}
 .thumbs button.on{border-color:var(--g)}
+/* 縮圖列最後一格「+N 張」：淡綠底、綠字，點下去開燈箱（listing.js 的 .more 分支） */
+.thumbs button.more{display:flex;align-items:center;justify-content:center;background:var(--g-50);border:1px solid var(--line);color:var(--g-800);font-weight:700;font-size:17px;line-height:1;font-family:inherit}
+.thumbs button.more small{font-size:11.5px;font-weight:500;margin-left:2px}
+@media(hover:hover){.thumbs button.more:hover{background:var(--g2);border-color:var(--g)}}
 .thumbs img{width:100%;height:100%;object-fit:cover;display:block}
 .media-btns{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
 .btn-o{display:inline-block;border:1px solid var(--g);color:var(--g);background:var(--card);border-radius:8px;padding:6px 14px;font-size:14px;text-decoration:none;cursor:pointer;font-family:inherit}
@@ -58,20 +98,40 @@ p{margin:0 0 1em}
 .yt button:after{content:"";position:absolute;left:26px;top:14px;border-style:solid;border-width:10px 0 10px 18px;border-color:transparent transparent transparent #fff}
 .yt iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 /* 價格卡 */
-.price-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 20px;margin:8px 0 14px;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+.price-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px;margin:8px 0 14px;box-shadow:0 1px 2px rgba(27,107,58,.05),0 1px 6px rgba(20,40,28,.04)}
 .price-card .lab{color:var(--mute);font-size:13px}
-.price-card .total{font-size:32px;font-weight:800;color:var(--red);line-height:1.2}
+.price-card .total{font-size:var(--fs-num);font-weight:700;color:var(--red);line-height:1.15;letter-spacing:-.3px}
 .price-card .total small{font-size:16px;font-weight:600;color:var(--ink);margin-left:2px}
-.price-card .unit{color:#444;font-size:14px;margin-top:2px}
-.price-card .down{font-size:13px;color:var(--red);margin-top:2px}
+.price-card .unit{color:var(--ink2);font-size:14px;margin-top:2px}
+.price-card .down{font-size:var(--fs-sm);color:var(--mute);margin-top:2px;line-height:1.5}
+.price-card .down b{color:var(--red);font-weight:700}
 .price-card .down s{color:var(--mute)}
-.price-card .code{margin:10px 0 4px;padding:8px 10px;background:var(--g2);border-radius:8px;font-size:14px;color:var(--g);font-weight:700}
+/* 物件編號原本是綠底框，和底下 LINE 鈕同色，看起來像第二顆按鈕（實際上不能按）。改純文字。 */
+.price-card .code{margin:10px 0 0;font-size:var(--fs-sm);color:var(--mute);letter-spacing:.2px}
 .price-card .note{color:var(--mute);font-size:12.5px;margin:6px 0 0}
+.pc-who{display:flex;gap:14px;align-items:center;margin:16px 0 0;padding-top:16px;border-top:1px solid var(--line)}
+.pc-who>div{display:flex;align-items:center;gap:8px;min-width:0}
+.pc-who img{width:40px;height:40px;border-radius:999px;object-fit:cover;background:var(--g-50);flex:0 0 40px}
+.pc-who span{display:flex;flex-direction:column;line-height:1.25;min-width:0;font-size:var(--fs-xs);color:var(--mute)}
+.pc-who b{font-size:var(--fs-ui);color:var(--ink);font-weight:700}
+.pc-trust{margin:10px 0 0;font-size:var(--fs-xs);color:var(--g-800);background:var(--g-50);border-radius:8px;padding:7px 10px;line-height:1.4}
 .price-card .cta-btns{margin-top:12px}
 .price-card .tels{grid-template-columns:1fr;gap:8px;margin:8px 0}
-.btn{display:block;text-align:center;background:var(--line-green);color:#fff;font-weight:700;padding:11px;border-radius:9px;text-decoration:none;margin:8px 0}
+/* 行內 SVG 圖示：跟著文字色走、跟著字級縮放；vertical-align 讓它坐在中文字的視覺中線上。
+   flex:none 是給 .cta-bar 那種 flex 按鈕用的，不加會被壓扁。 */
+.ic{width:1em;height:1em;fill:currentColor;vertical-align:-.13em;margin-right:.42em;flex:none}
+.btn{display:block;text-align:center;background:var(--line-green);color:#fff;font-weight:700;padding:11px;border-radius:8px;text-decoration:none;margin:8px 0}
+.price-card .btn:not(.tel):not(.book){background:transparent;color:var(--line-green);border:1.5px solid var(--line-green);padding:9.5px}
+@media(hover:hover){.price-card .btn:not(.tel):not(.book):hover{background:var(--line-green);color:#fff}}
 .btn.tel{background:var(--g)}
 .btn.book{background:var(--blue)}
+/* 按鈕三態。以前滑過去零反應、Tab 到會冒出瀏覽器預設的藍框（全站唯一的藍色，看起來像沒做完）。 */
+.btn,.btn-s,.btn-o,.fbar .go,.cta-bar a,.maptabs button{transition:background .15s,border-color .15s,transform .08s}
+.btn.tel:hover,.btn-s:hover,.fbar .go:hover{background:var(--g-800)}
+.btn-o:hover{border-color:var(--g-800)}
+.btn:active,.btn-s:active,.btn-o:active,.fbar .go:active{transform:translateY(1px)}
+:focus-visible{outline:2px solid var(--g);outline-offset:3px}
+.btn:focus-visible,.btn-s:focus-visible,.fbar .go:focus-visible,.cta-bar a:focus-visible{outline:2px solid #fff;outline-offset:-4px;box-shadow:0 0 0 3px var(--g)}
 /* 兩位的電話鈕永遠一樣大（使用者 2026-08-20：「電話要一樣大，不然是要吵架嗎」）。
    包成 grid 就不會像 flex 那樣換行後一顆獨佔整列、變成一大一小。 */
 .tels{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -82,78 +142,136 @@ p{margin:0 0 1em}
 @media(max-width:768px){
   .cta-bar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--card);border-top:1px solid var(--line);padding:8px 10px calc(8px + env(safe-area-inset-bottom));gap:8px;box-shadow:0 -2px 12px rgba(0,0,0,.08)}
   /* 三顆（LINE＋兩位電話）要塞進 360px 的手機：字級縮一點、左右內距收窄、不換行 */
-  .cta-bar a{flex:1;min-width:0;text-align:center;color:#fff;font-weight:700;text-decoration:none;padding:11px 2px;border-radius:9px;font-size:14.5px;white-space:nowrap;background:var(--line-green)}
+  .cta-bar a{flex:1;min-width:0;text-align:center;color:#fff;font-weight:700;text-decoration:none;padding:11px 2px;border-radius:8px;font-size:14.5px;white-space:nowrap;background:var(--line-green)}
   .cta-bar a.tel{background:var(--g)}
   .cta-bar a.book{background:var(--blue)}
   .l-side .cta-btns{display:none}
+  /* ── 手機收緊（2026-08-21）。目標：少捲一點就看到重點，不動桌機、不動品牌綠 ── */
+  .site-header .in{padding:8px 16px 6px;gap:6px 12px}
+  .nav a{padding:7px 10px}                       /* 約 40px 高，次要導覽夠按 */
+  .crumb{margin:8px 0 6px}
+  h1{margin:8px 0 4px}
+  .sub{margin:0 0 6px}
+  /* 相簿縮圖出血到螢幕邊，永遠露出 3 張半 →「還可以往右滑」的暗示穩定。
+     ⚠️ 寬度不可用固定 px：78px 在 360 寬剛好排滿 4 張，暗示反而消失。 */
+  .thumbs{margin:0 -18px;padding:8px 18px 2px}
+  .thumbs button{flex:0 0 calc((100% - 12px)/3.5)}
+  .media-btns{margin:4px 0 8px}
+  .media-btns .btn-o{padding:5px 12px}
+  .keyfacts b{font-size:var(--fs-body)}
+  .pc-who{gap:10px}
+  .price-card{padding:14px 16px}
+  .price-card .total{font-size:30px}
+  /* 表格左欄原本寫死 7em，「步行約 169 公尺」被擠成三行。
+     ⚠️ 只鎖第三欄不換行——td:last-child 會讓「關於我們」頁橫向捲動（實測 360→481px）。 */
+  table.facts th{width:auto;white-space:nowrap;padding:11px 12px}
+  table.facts td{padding:11px 12px}
+  table.facts td:nth-child(3){white-space:nowrap;text-align:right}
+  /* 觸控目標 ≥44px */
+  .pk-btn{padding:10px 12px;min-height:44px}
+  .fbar .go,.fbar .mapbtn,.nowbar .btn-o{min-height:44px}
+  .so{width:40px;height:40px}
+  .socials{gap:10px}
+  .gallery .count{padding:7px 14px}
 }
 /* 表格 */
-table.facts{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:15px}
-table.facts th{text-align:left;width:7em;padding:13px 14px;color:var(--mute);font-weight:500;background:transparent;border-bottom:1px solid var(--line2);vertical-align:top}
-table.facts td{padding:13px 14px;border-bottom:1px solid var(--line2)}
+/* 表格原本有外框＋白底＋圓角，整頁四張這種框疊起來很吵。去框只留列線，資訊密度不變、噪音少一半。 */
+table.facts{width:100%;border-collapse:collapse;background:transparent;font-size:var(--fs-data);line-height:1.55}
+table.facts th{text-align:left;width:7em;padding:11px 2px;color:var(--mute);font-weight:500;background:transparent;border-bottom:1px solid var(--line);vertical-align:top}
+table.facts td{padding:11px 2px;border-bottom:1px solid var(--line)}
 table.facts tr:last-child th,table.facts tr:last-child td{border-bottom:0}
 @media(min-width:600px){
-  table.facts.two{display:grid;grid-template-columns:1fr 1fr}
+  table.facts.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:32px}
   table.facts.two tbody{display:contents}
   table.facts.two tr{display:flex}
   table.facts.two th{flex:0 0 7em}
-  table.facts.two td{flex:1}
+  table.facts.two td{flex:1;min-width:0}
+  table.facts.two tr:last-child th,table.facts.two tr:last-child td{border-bottom:1px solid var(--line)}
 }
 .area-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:0 0 8px}
-.area-grid div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:14px}
+.area-grid div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:var(--fs-ui)}
 .area-grid b{display:block;font-size:17px;color:var(--ink)}
 .area-grid span{color:var(--mute);font-size:12.5px}
 .ratio{font-size:15px}
 .ratio b{color:var(--g);font-size:18px}
-.points{margin:0;padding-left:1.3em}
-.points li{margin:7px 0}
+/* 重點原本是預設的小黑點清單，看起來像備忘錄。改成綠勾＋雙欄：
+   勾是「已具備」的意思，比黑點多帶一層語氣，而且雙欄能省掉一半高度。 */
+.points{margin:0;padding:0;list-style:none;display:grid;gap:8px 24px}
+.points li{margin:0;position:relative;padding-left:24px;line-height:1.6}
+.points li::before{content:"";position:absolute;left:3px;top:.34em;width:6px;height:11px;border:solid var(--g);border-width:0 2px 2px 0;transform:rotate(45deg)}
+@media(min-width:600px){.points{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+/* 生活機能原本 15 列平鋪的表格，看起來像帳單。分成交通／學校／購物／醫療／休閒五組，
+   每項寫「步行 N 分」在前、公尺在後——買方腦子裡想的是分鐘不是公尺。 */
+.facil{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+@media(min-width:600px){.facil{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.fg h3{margin:0 0 6px;font-size:var(--fs-sm);color:var(--g-800);font-weight:700;letter-spacing:.4px}
+.fg ul{margin:0;padding:0;list-style:none}
+.fg li{display:flex;align-items:baseline;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:var(--fs-data);line-height:1.5}
+.fg li:last-child{border-bottom:0}
+.fg li span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fg li b{font-weight:700;color:var(--ink);white-space:nowrap}
+.fg li i{font-style:normal;color:var(--mute);font-size:var(--fs-xs);white-space:nowrap}
 .intro p{margin:0 0 .8em}
 .small,.note{color:var(--mute);font-size:13px}
 /* 地圖 / 價格帶 / 貸款 */
-.map iframe{width:100%;height:300px;border:0;border-radius:12px;background:#eee}
+.map iframe{width:100%;height:300px;border:0;border-radius:12px;background:#eef4f0}
 .band{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
 .band .bar{position:relative;height:38px;margin:26px 0 8px}
-.band .rng{position:absolute;left:14.3%;right:14.3%;top:14px;height:10px;background:linear-gradient(90deg,#cfe6d7,var(--g),#cfe6d7);border-radius:5px}
+.band .rng{position:absolute;left:14.3%;right:14.3%;top:14px;height:10px;background:linear-gradient(90deg,var(--g-200),var(--g),var(--g-200));border-radius:5px}
 .band .tick{position:absolute;top:0;transform:translateX(-50%);font-size:12px;color:var(--mute);white-space:nowrap}
-.band .tick i{display:block;width:2px;height:16px;background:#999;margin:2px auto 0}
+.band .tick i{display:block;width:2px;height:16px;background:var(--faint);margin:2px auto 0}
 .band .me{position:absolute;top:-24px;transform:translateX(-50%);text-align:center;font-size:12px;color:var(--red);font-weight:700;white-space:nowrap}
 .band .me i{display:block;width:0;height:0;margin:0 auto;border:8px solid transparent;border-top:12px solid var(--red)}
 .loan{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
 .loan .row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .loan label{font-size:13px;color:var(--mute)}
-.loan input{width:100%;font-size:16px;padding:6px 8px;border:1px solid #ccc;border-radius:8px;font-family:inherit}
+.loan input{width:100%;font-size:16px;padding:6px 8px;border:1px solid var(--line-strong);border-radius:8px;font-family:inherit}
 .loan .out{margin-top:10px;font-size:15px}
 .loan .out b{color:var(--red);font-size:22px}
 .loan .row.r4{grid-template-columns:repeat(2,1fr)}
 .loan .res{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
-.loan .res div{background:var(--g2);border-radius:10px;padding:10px 12px}
+.loan .res div{background:var(--g2);border-radius:12px;padding:10px 12px}
 .loan .res>div>span{display:block;color:var(--mute);font-size:13px}
 .loan .res b{font-size:19px}
 .loan .res .big{grid-column:1/-1;background:var(--card);border:1px solid var(--line)}
 .loan .res .big b{color:var(--red);font-size:30px}
 @media(min-width:700px){.loan .row.r4{grid-template-columns:repeat(4,1fr)}}
 /* 卡片 */
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin:8px 0}
-.card{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;text-decoration:none;color:var(--ink);transition:box-shadow .15s}
-.card:hover{box-shadow:0 4px 16px rgba(0,0,0,.09)}
-.card .ph{aspect-ratio:4/3;background:#eee}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin:0 0 8px}
+.card{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;text-decoration:none;color:var(--ink);box-shadow:0 1px 2px rgba(27,107,58,.04);transition:box-shadow .2s,transform .2s,border-color .2s}
+/* hover 只給真的有滑鼠的裝置：手機點一下會「黏住」浮起狀態，看起來像壞掉 */
+@media(hover:hover){
+  .card .ph{overflow:hidden}
+  .card .ph img{transition:transform .35s ease}
+  .card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(27,107,58,.12);border-color:var(--g-200)}
+  .card:hover .ph img{transform:scale(1.04)}
+  .card:hover .nm{color:var(--g)}
+  .mapop .card:hover{transform:none}   /* Leaflet 彈出卡包在 overflow:hidden 白框裡，浮起會露白縫 */
+}
+.card .ph{aspect-ratio:4/3;background:#eef4f0;position:relative}
+/* 照片角標：左上「新上架」、左下捷運站。壓在照片上而不是排進文字區——
+   文字區已經四行了，再加會變成一片字；角標壓在照片上反而是空白處，看起來還變乾淨。 */
+.card .tg{position:absolute;left:8px;font-size:11.5px;line-height:1;padding:5px 8px;border-radius:6px;font-weight:700;letter-spacing:.2px;pointer-events:none}
+.card .tg.new{top:8px;background:var(--g);color:#fff}
+.card .tg.mrt{bottom:8px;background:rgba(17,32,24,.72);color:#fff;font-weight:500;backdrop-filter:blur(2px)}
 .card .ph img{width:100%;height:100%;object-fit:cover;display:block}
 .card .bd{padding:10px 12px 12px}
-.card .nm{font-weight:700;display:block;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card .nm{font-weight:700;font-size:15px;display:block;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .card .mt{color:var(--mute);font-size:13px;margin-top:2px}
-.card .pr{color:var(--red);font-weight:800;font-size:18px;margin-top:4px}
+.card .mt2{color:var(--faint);font-size:12.5px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card .pr{color:var(--red);font-weight:700;font-size:19px;line-height:1.3;margin-top:8px}
 .card .pr small{color:var(--mute);font-weight:400;font-size:12px;margin-left:6px}
 /* Agent / CTA */
-.agent{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:20px 0}
+.agent{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin:24px 0}
 .agent .who{display:flex;gap:14px;flex-wrap:wrap;margin:6px 0 10px}
-.agent .who > div{flex:1 1 240px;background:var(--g2);border-radius:10px;padding:12px;display:flex;gap:12px;align-items:center}
-.agent .who .face{width:72px;height:72px;border-radius:50%;object-fit:cover;flex:0 0 72px;background:#e6ebe8}
+.agent .who > div{flex:1 1 240px;background:var(--g2);border-radius:12px;padding:12px;display:flex;gap:12px;align-items:center}
+.agent .who .face{width:72px;height:72px;border-radius:50%;object-fit:cover;flex:0 0 72px;background:var(--g-50)}
 .agent .who .txt{display:block;min-width:0;flex:1 1 auto}
 .agent .who .txt .small{display:block;margin:2px 0 3px;line-height:1.5}
 .agent .who .txt b{display:block;font-size:17px;line-height:1.35}
 .agent .who b{font-size:17px}
 .agent .who a{display:block;font-weight:700;text-decoration:none;font-size:18px}
-.agent .org{color:#555;font-size:13px;margin-top:8px}
+.agent .org{color:var(--ink2);font-size:var(--fs-sm);margin-top:8px}
 .code-line{margin:18px 0;padding:12px 14px;background:var(--g2);border-left:4px solid var(--g);border-radius:8px;font-weight:700;color:var(--g)}
 .legal{color:var(--mute);font-size:13px;line-height:1.7}
 .cta{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin:24px 0}
@@ -169,7 +287,7 @@ table.facts tr:last-child th,table.facts tr:last-child td{border-bottom:0}
 /* 篩選列（信義式下拉面板）：一排白色圓角鈕，點開浮出面板；手機上橫向捲動 */
 .fbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;margin:12px 0}
 .pick{position:relative}
-.pk-btn{display:flex;align-items:center;gap:6px;max-width:230px;font-family:inherit;font-size:14.5px;color:var(--ink);background:#fff;border:1px solid #d6dbd8;border-radius:9px;padding:8px 12px;cursor:pointer;line-height:1.4}
+.pk-btn{display:flex;align-items:center;gap:6px;max-width:230px;font-family:inherit;font-size:14.5px;color:var(--ink);background:#fff;border:1px solid var(--line-strong);border-radius:8px;padding:8px 12px;cursor:pointer;line-height:1.4}
 .pk-btn b{font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pk-btn:hover{border-color:var(--g);color:var(--g)}
 .pk-btn[aria-expanded=true]{border-color:var(--g);color:var(--g);box-shadow:0 0 0 2px var(--g2)}
@@ -179,12 +297,12 @@ table.facts tr:last-child th,table.facts tr:last-child td{border-bottom:0}
 .pk-two{display:grid;grid-template-columns:126px 1fr;gap:10px;max-height:52vh}
 .pk-col{overflow-y:auto;max-height:52vh}
 .pk-col.cities{border-right:1px solid var(--line2);padding-right:6px}
-.ct{display:flex;justify-content:space-between;gap:6px;width:100%;text-align:left;font-family:inherit;font-size:14px;background:none;border:0;border-radius:7px;padding:7px 8px;cursor:pointer;color:var(--ink)}
+.ct{display:flex;justify-content:space-between;gap:6px;width:100%;text-align:left;font-family:inherit;font-size:14px;background:none;border:0;border-radius:8px;padding:7px 8px;cursor:pointer;color:var(--ink)}
 .ct b{font-weight:400;color:var(--mute);font-size:12.5px}
 .ct:hover{background:var(--line2)}
 .ct.on{background:var(--g2);color:var(--g);font-weight:700}
 .pk-col.areas{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:2px;align-content:start}
-.ck{display:flex;align-items:center;gap:6px;font-size:14px;padding:6px 7px;border-radius:7px;cursor:pointer}
+.ck{display:flex;align-items:center;gap:6px;font-size:var(--fs-ui);padding:6px 7px;border-radius:8px;cursor:pointer}
 .ck:hover{background:var(--line2)}
 .ck b{font-weight:400;color:var(--mute);font-size:12px}
 .ck.hide{display:none}
@@ -192,19 +310,52 @@ table.facts tr:last-child th,table.facts tr:last-child td{border-bottom:0}
 .pk-rows{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:2px;max-height:52vh;overflow-y:auto}
 .pk-rows .rw{display:flex;align-items:center;gap:8px;grid-column:1/-1;font-size:14px;padding:4px 0}
 .pk-rows .rw span{flex:0 0 62px;color:var(--mute);font-size:13px}
-.pk-rows .rw select{flex:1;font-family:inherit;font-size:14.5px;padding:6px;border:1px solid #ccc;border-radius:8px;background:#fff}
+.pk-rows .rw select{flex:1;font-family:inherit;font-size:14.5px;padding:6px;border:1px solid var(--line-strong);border-radius:8px;background:#fff}
 .pk-bands{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.bd{font-family:inherit;font-size:13.5px;background:#f6f7f6;border:1px solid transparent;border-radius:7px;padding:8px 4px;cursor:pointer;color:var(--ink)}
-.bd:hover{border-color:var(--g)}
-.bd.on{background:var(--g2);border-color:var(--g);color:var(--g);font-weight:700}
+/* ⚠️ 一定要限定在 .pk-bands 底下：物件卡片的文字區（listing_render.card_html／listing.js card()）
+   也叫 class="bd"，不限定的話全站 1,600 頁的卡片會被染成灰底、標題縮成 13.5px、hover 冒綠框。
+   listing.js:224/240 本來就用 `.pk-bands .bd` 選取，所以 HTML 與 JS 都不用動。
+   （2026-08-21 修；不要改成把按鈕改名 .pk-band，那會漏掉 listing.js 四處選擇器） */
+.pk-bands .bd{font-family:inherit;font-size:13.5px;background:var(--g-50);border:1px solid transparent;border-radius:7px;padding:8px 4px;cursor:pointer;color:var(--ink)}
+.pk-bands .bd:hover{border-color:var(--g)}
+.pk-bands .bd.on{background:var(--g2);border-color:var(--g);color:var(--g);font-weight:700}
 .pk-range{display:flex;align-items:center;gap:6px;margin-top:10px}
-.pk-range input{width:100%;min-width:0;font-family:inherit;font-size:14.5px;padding:7px;border:1px solid #ccc;border-radius:8px}
+.pk-range input{width:100%;min-width:0;font-family:inherit;font-size:14.5px;padding:7px;border:1px solid var(--line-strong);border-radius:8px}
 .pk-range .u{color:var(--mute);font-size:13px;flex:0 0 auto}
 .pk-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:1px solid var(--line2);margin-top:10px;padding-top:9px}
 .pk-foot .lnk{background:none;border:0;font-family:inherit;font-size:13.5px;color:var(--mute);cursor:pointer;text-decoration:underline}
 .btn-s{font-family:inherit;font-size:14px;background:var(--g);color:#fff;border:0;border-radius:8px;padding:7px 18px;cursor:pointer;font-weight:700}
-.fbar .go{font-family:inherit;font-size:15px;background:var(--g);color:#fff;border:0;border-radius:9px;padding:9px 24px;cursor:pointer;font-weight:700}
-.fbar .mapbtn{margin-left:auto;font-size:14px;text-decoration:none;color:var(--g);border:1px solid var(--g);border-radius:9px;padding:8px 14px;white-space:nowrap}
+.fbar .go{font-family:inherit;font-size:var(--fs-data);background:var(--g);color:#fff;border:0;border-radius:8px;padding:9px 24px;cursor:pointer;font-weight:700}
+.fbar .mapbtn{margin-left:auto;font-size:var(--fs-ui);text-decoration:none;color:var(--g);border:1px solid var(--g);border-radius:8px;padding:8px 14px;white-space:nowrap}
+/* 手機卡片兩欄：單欄大圖是用「大」掩飾沒有節奏，8 張要滑 3,076px。
+   ⚠️ 名稱要兩行夾（172px 寬一行只放得下 10 個字，22% 的名稱會被切）；
+   ⚠️ 規格列要 keep-all，否則「28.7坪」的「坪」會孤字掉到第二行。 */
+@media(max-width:600px){
+  .cards{grid-template-columns:1fr 1fr;gap:10px}
+  /* 找房頁與分面頁的手機版改橫式小卡：一屏看得到 4–5 件（直式只看得到 2 件），
+     照片仍是 4:3 但縮到 116px，右邊放四層文字。
+     ⚠️ 只有 .cards.rows 這樣——首頁精選與物件頁「相似物件」是「逛」的情境，大照片才有說服力。
+     ⚠️ class 叫 rows 不叫 list：.list a{padding:12px 0} 是知識文列表在用的，撞名會把卡片撐開。 */
+  .cards.rows{grid-template-columns:minmax(0,1fr);gap:10px}
+  .cards.rows .card{display:grid;grid-template-columns:116px minmax(0,1fr);gap:12px;align-items:stretch}
+  .cards.rows .card .ph{aspect-ratio:4/3;height:100%}
+  .cards.rows .card .bd{padding:10px 12px 10px 0;display:flex;flex-direction:column;justify-content:center}
+  .cards.rows .card .nm{-webkit-line-clamp:1;white-space:nowrap;font-size:15px}
+  .cards.rows .card .pr{font-size:17px;margin-top:6px}
+  .cards.rows .card .pr small{display:inline}
+  .cards.rows .card .tg.mrt{display:none}   /* 116px 寬塞不下站名，捷運資訊本來就在第二層文字裡 */
+  .card .bd{padding:8px 10px 10px}
+  .card .nm{font-size:14.5px;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.35}
+  .card .mt{font-size:12px;word-break:keep-all;line-height:1.6}
+  .card .mt2{font-size:11.5px}
+  .card .tg{font-size:10.5px;padding:4px 6px;left:6px}
+  .card .tg.new{top:6px}
+  .card .tg.mrt{bottom:6px}
+  .card .pr{font-size:16px}
+  .card .pr small{display:none}
+  .hero select{min-width:0;width:100%}
+  .hero select:nth-of-type(3){grid-column:1/3}
+}
 @media(max-width:640px){
   .fbar{gap:6px;padding:8px}
   .pk-btn{font-size:13.5px;padding:7px 9px;max-width:44vw}
@@ -216,10 +367,10 @@ table.facts tr:last-child th,table.facts tr:last-child td{border-bottom:0}
 }
 /* 地圖找房 /listing/map/ */
 .maptabs{display:none;gap:6px;margin:4px 0 8px}
-.maptabs button{flex:1;font-family:inherit;font-size:14.5px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px;cursor:pointer}
+.maptabs button{flex:1;font-family:inherit;font-size:14.5px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px;cursor:pointer}
 .maptabs button.on{background:var(--g);color:#fff;border-color:var(--g);font-weight:700}
 .maplay{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;margin:8px 0 12px}
-#map{height:min(74vh,680px);border-radius:12px;border:1px solid var(--line);background:#eef1ef;z-index:1}
+#map{height:min(74vh,680px);border-radius:12px;border:1px solid var(--line);background:var(--g-50);z-index:1}
 .mapside{border:1px solid var(--line);border-radius:12px;background:var(--card);display:flex;flex-direction:column;max-height:min(74vh,680px)}
 .mapside .mh{padding:10px 12px;border-bottom:1px solid var(--line2)}
 .mapside .mh b{display:block;font-size:15px;color:var(--g)}
@@ -232,9 +383,14 @@ table.facts tr:last-child th,table.facts tr:last-child td{border-bottom:0}
 .cards.mini .card .ph{aspect-ratio:4/3}
 .cards.mini .card .bd{padding:6px 8px 6px 0}
 .pinwrap{background:none;border:0}
-.pin{display:inline-block;font-style:normal;font-size:12.5px;font-weight:700;color:#fff;background:var(--g);border:1.5px solid #fff;border-radius:999px;padding:3px 9px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.28);transform:translate(-50%,-50%);cursor:pointer}
-.pin.n{background:#3a5ba0}
-.pin:hover{background:#0f4f29}
+.pin{display:inline-block;position:relative;font-style:normal;font-size:12.5px;font-weight:700;color:var(--g-900);background:#fff;border:1.5px solid var(--g);border-radius:999px;padding:3px 9px;white-space:nowrap;box-shadow:0 2px 8px rgba(20,40,28,.22);transform:translate(-50%,-50%);cursor:pointer}
+.pin:not(.n)::after{content:"";position:absolute;left:50%;top:100%;margin-left:-4px;border:4px solid transparent;border-top:5px solid var(--g)}
+.pin.n{background:var(--g);color:#fff;border-color:#fff;font-size:12px}
+@media(hover:hover){
+  .pin:hover{background:var(--g);color:#fff}
+  .pin:hover::after{border-top-color:var(--g)}
+  .pin.n:hover{background:var(--g-900);color:#fff}   /* 不寫這條，群聚泡泡 hover 會變成綠底綠字看不見 */
+}
 .mapop .leaflet-popup-content{margin:0;width:230px!important}
 .mapop .leaflet-popup-content-wrapper{padding:0;overflow:hidden;border-radius:12px}
 .mapop .card{border:0}
@@ -251,17 +407,20 @@ table.facts tr:last-child th,table.facts tr:last-child td{border-bottom:0}
 .socials{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:0 0 12px}
 .socials .so-t{font-size:13px;color:var(--mute)}
 .so{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 10px;border-radius:999px;color:#fff;text-decoration:none;font-size:13px;font-weight:700;line-height:1}
-.so.fb{background:#1877f2}.so.ig{background:#c13584}.so.yt{background:#ff0000}
-.so.th{background:#000}.so.line{background:var(--line-green)}
-.so:hover{opacity:.85}
+/* 平常一律素色膠囊，滑過去才現各家品牌色。以前五種高飽和原色排在法規字樣旁邊，
+   是整頁色彩密度最高的地方，而它只是次要連結。 */
+.so{background:#fff;color:var(--mute);border:1px solid var(--line)}
+.so.fb:hover{background:#1877f2;color:#fff}.so.ig:hover{background:#c13584;color:#fff}
+.so.yt:hover{background:#e00;color:#fff}.so.th:hover{background:#000;color:#fff}
+.so.line:hover{background:var(--line-green);color:#fff}
 /* 找房頁「目前顯示 台北市 大安區．295 件／看全部」列 */
 .nowbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:10px 0 6px;
-padding:10px 14px;background:var(--g2);border-radius:10px;font-size:14.5px;color:var(--g);line-height:1.5}
-.nowbar b{font-weight:700;min-width:0}
+padding:4px 2px;background:transparent;border-radius:0;font-size:var(--fs-ui);color:var(--ink);line-height:1.5}
+.nowbar b{font-weight:700;min-width:0;color:var(--g)}
 .nowbar .btn-o{background:var(--card);white-space:nowrap;flex:0 0 auto}
 .facets{font-size:14px;line-height:2;margin:8px 0}
 .facets a{display:inline-block;margin-right:10px;color:var(--g)}
-.hero{background:linear-gradient(135deg,var(--g),#2c8a50);color:#fff;border-radius:16px;padding:28px 20px;margin:16px 0}
+.hero{background:radial-gradient(120% 140% at 88% 8%,rgba(255,255,255,.16) 0%,rgba(255,255,255,0) 55%),linear-gradient(160deg,var(--g-900) 0%,var(--g) 52%,#2c8a50 100%);color:#fff;border-radius:16px;padding:28px 20px;margin:16px 0}
 .hero h1{color:#fff;font-size:26px;margin:0 0 4px}
 .hero p{opacity:.92;margin:0 0 14px}
 .hero .search{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;background:rgba(255,255,255,.14);padding:10px;border-radius:12px}
@@ -279,10 +438,13 @@ background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.55);text-dec
 .err h1{font-size:26px}
 
 /* 團隊照（首頁 hero／關於我們） */
-.hero .team{width:100%;height:auto;max-width:460px;border-radius:14px;display:block;margin:0 0 16px;
+.hero .team{width:100%;height:auto;max-width:460px;border-radius:12px;display:block;margin:0 0 16px;
 box-shadow:0 2px 12px rgba(0,0,0,.12)}
 .about-2col{display:grid;grid-template-columns:1fr;gap:18px;align-items:start}
-.about-2col .formal{width:100%;height:auto;max-width:300px;border-radius:12px;display:block}
+.about-2col .formal{width:100%;max-width:300px;aspect-ratio:4/5;object-fit:cover;object-position:50% 22%;border-radius:12px;display:block}
+/* 兩欄版右邊已經逐字寫了兩個人的介紹，左邊又放兩顆圓頭像＝同一頁看到四次同兩張臉。
+   ⚠️ 只藏 .about-2col 裡的——物件頁聯絡卡與價格卡的圓臉要留著。 */
+.about-2col .who .face{display:none}
 @media(min-width:760px){
   .about-2col{grid-template-columns:260px minmax(0,1fr)}
   .hero{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:24px;align-items:center}
@@ -294,11 +456,11 @@ box-shadow:0 2px 12px rgba(0,0,0,.12)}
 
 /* 首頁兩大需求入口（我要找房／我要賣房）；LINE 是聯絡方式 → hero 次級鈕＋右下浮動鈕＋手機底部列 */
 .ways{display:grid;grid-template-columns:1fr;gap:12px;margin:16px 0 8px}
-.ways .way{display:block;padding:18px 20px;border-radius:14px;text-decoration:none;
+.ways .way{display:block;padding:16px;border-radius:12px;text-decoration:none;
 border:1px solid var(--line);background:var(--card);transition:box-shadow .15s}
 .ways .way:hover{box-shadow:0 2px 12px rgba(0,0,0,.10)}
 .ways .way b{display:block;font-size:20px;color:var(--g);margin-bottom:4px}
-.ways .way span{color:var(--mute);font-size:14.5px;line-height:1.6}
+.ways .way span{display:block;color:var(--mute);font-size:var(--fs-ui);line-height:1.6}
 .ways .way.sell{background:var(--g2);border-color:#cfe0d6}
 @media(min-width:700px){.ways{grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}}
 /* 右下角浮動 LINE 圓鈕（捲一段才淡入，不一開始就擋內容；手機讓開底部固定列） */
