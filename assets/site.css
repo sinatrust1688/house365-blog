@@ -380,6 +380,10 @@ table.facts tr:last-child th,table.facts tr:last-child td{border-bottom:0}
 /* ⚠ grid-auto-rows 一定要寫死 max-content：這個格線在一個限高、可捲動的欄位裡，
    而卡片是 overflow:hidden（＝最小高度算 0），auto 列會被壓成只剩邊框 2px、整排看起來空白（2026-08-20 踩過）。 */
 .cards.mini .card{display:grid;grid-template-columns:104px 1fr;gap:9px}
+/* 地圖側欄縮圖只有 104px 寬，兩個角標會把照片蓋掉一半。
+   捷運站名整個拿掉（地圖本身就在指位置，重複），「新上架」縮小留著。 */
+.cards.mini .card .tg.mrt{display:none}
+.cards.mini .card .tg.new{font-size:10px;padding:3px 5px;left:5px;top:5px}
 .cards.mini .card .ph{aspect-ratio:4/3}
 .cards.mini .card .bd{padding:6px 8px 6px 0}
 .pinwrap{background:none;border:0}
@@ -441,7 +445,8 @@ background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.55);text-dec
 .hero .team{width:100%;height:auto;max-width:460px;border-radius:12px;display:block;margin:0 0 16px;
 box-shadow:0 2px 12px rgba(0,0,0,.12)}
 .about-2col{display:grid;grid-template-columns:1fr;gap:18px;align-items:start}
-.about-2col .formal{width:100%;max-width:300px;aspect-ratio:4/5;object-fit:cover;object-position:50% 22%;border-radius:12px;display:block}
+/* ⚠️ height:auto 不可省：<img> 標籤上寫著 height="1650"，那是瀏覽器的「呈現提示」，沒有 height:auto 蓋掉它，aspect-ratio 就不生效，圖會變成 260×1650 的一條（2026-08-21 踩到）。 */
+.about-2col .formal{width:100%;height:auto;max-width:300px;aspect-ratio:4/5;object-fit:cover;object-position:50% 22%;border-radius:12px;display:block}
 /* 兩欄版右邊已經逐字寫了兩個人的介紹，左邊又放兩顆圓頭像＝同一頁看到四次同兩張臉。
    ⚠️ 只藏 .about-2col 裡的——物件頁聯絡卡與價格卡的圓臉要留著。 */
 .about-2col .who .face{display:none}
