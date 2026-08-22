@@ -487,3 +487,4 @@ border:1px solid var(--line);background:var(--card);color:var(--ink);text-decora
 .quote{margin:0;padding:16px 18px;background:var(--card);border:1px solid var(--line);border-radius:12px}
 .quote p{margin:0 0 8px}
 .quote cite{color:var(--mute);font-size:13.5px;font-style:normal}
+
