@@ -1,0 +1,20 @@
+/* 社區導覽專屬樣式。只在 /community/ 頁載入——site.css 已逼近 40KB 測試上限，不往裡塞。
+   設計沿用 site.css 的 :root 變數（色階／字級尺／圓角三階），只加社區頁才有的版型。 */
+
+/* Hero：滿版大圖＋左下角名稱與一句主張。學 mplusyonghe 的滿版氣勢，但配色是我們的綠。
+   ⚠️ img 要 height:auto 蓋掉 HTML 的 height 屬性（about 頁 2026-08-21 踩過同一個坑）。 */
+.comm-hero{position:relative;border-radius:16px;overflow:hidden;margin:16px 0 24px;background:var(--g-900)}
+.comm-hero img{width:100%;height:auto;max-height:520px;object-fit:cover;display:block}
+.comm-hero .scrim{position:absolute;left:0;right:0;bottom:0;padding:48px 28px 22px;
+  background:linear-gradient(180deg,rgba(15,40,25,0) 0%,rgba(15,40,25,.72) 70%);color:#fff}
+.comm-hero h1{color:#fff;margin:0 0 2px;font-size:var(--fs-h1);line-height:1.25}
+.comm-hero .scrim p{margin:0;font-size:var(--fs-lg);opacity:.95}
+.comm-hero .loc{display:block;margin-top:6px;font-size:var(--fs-sm);opacity:.85}
+/* 沒有外觀照時（照片還沒上雲端），退成綠底文字卡，不會破圖 */
+.comm-hero:not(:has(img)) .scrim{position:static;background:none;padding:36px 28px}
+
+@media(max-width:600px){
+  .comm-hero .scrim{padding:36px 16px 14px}
+  .comm-hero h1{font-size:22px}
+  .comm-hero .scrim p{font-size:var(--fs-data)}
+}
